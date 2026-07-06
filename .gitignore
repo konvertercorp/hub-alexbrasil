@@ -27,3 +27,9 @@ dev-dist
 # Ferramentas locais
 .claude/
 claude_settings_snippet.json
+
+.vercel
+.env*
+
+# Local Netlify folder
+.netlify

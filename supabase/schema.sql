@@ -113,6 +113,38 @@ grant execute on function get_inviter_by_code(text) to anon, authenticated;
 grant execute on function get_descendant_ids(uuid) to authenticated;
 
 -- ============================================================
+-- 5b. Evita cadastro duplicado: se a pessoa já tem um pedido de
+--     voto registrado (mesmo telefone), reaproveita o nome e, ao
+--     virar Líder, atualiza o tipo de contato em vez de duplicar.
+-- ============================================================
+create or replace function find_pedido_by_telefone(phone text)
+returns table (nome text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select nome from pedidos_voto
+  where regexp_replace(telefone, '\D', '', 'g') = regexp_replace(phone, '\D', '', 'g')
+  order by created_at desc
+  limit 1;
+$$;
+
+create or replace function mark_pedido_as_lider(phone text)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update pedidos_voto
+  set tipo_contato = 'Liderança', voto = 'sim'
+  where regexp_replace(telefone, '\D', '', 'g') = regexp_replace(phone, '\D', '', 'g');
+$$;
+
+grant execute on function find_pedido_by_telefone(text) to anon, authenticated;
+grant execute on function mark_pedido_as_lider(text) to anon, authenticated;
+
+-- ============================================================
 -- 6. Row Level Security — profiles
 -- ============================================================
 create policy "profiles_select_team" on profiles

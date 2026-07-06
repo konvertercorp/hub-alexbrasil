@@ -11,8 +11,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Como o login usa "usuário" em vez de e-mail, sintetizamos um e-mail
-// interno para o Supabase Auth (que exige e-mail ou telefone).
-export function usernameToEmail(username) {
-  return `${username.trim().toLowerCase()}@example.com`
+// O login é feito pelo telefone em vez de e-mail, então sintetizamos um
+// e-mail interno para o Supabase Auth (que exige e-mail ou telefone).
+export function phoneToEmail(telefone) {
+  const digits = telefone.replace(/\D/g, '')
+  return `${digits}@example.com`
 }

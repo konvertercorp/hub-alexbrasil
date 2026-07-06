@@ -13,7 +13,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'logo.svg'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'alex-brasil.png'],
       manifest: {
         name: 'HUB AlexBrasil',
         short_name: 'HUB AlexBrasil',

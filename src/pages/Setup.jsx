@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, ShieldCheck } from 'lucide-react'
+import { Loader2, ShieldCheck, CheckCircle2 } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import { InstallHint } from '../components/InstallHint'
+import { formatPhone, isValidPhone } from '../utils/formatters'
 
 export function Setup() {
   const { register } = useAuth()
@@ -10,9 +12,10 @@ export function Setup() {
 
   const [checking, setChecking] = useState(true)
   const [alreadyConfigured, setAlreadyConfigured] = useState(false)
-  const [form, setForm] = useState({ nome: '', telefone: '', username: '', password: '' })
+  const [form, setForm] = useState({ nome: '', telefone: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [done, setDone] = useState(false)
 
   useEffect(() => {
     supabase.rpc('profiles_count').then(({ data }) => {
@@ -25,24 +28,23 @@ export function Setup() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (form.nome.trim().length < 3 || !form.username || form.password.length < 6) {
-      setError('Preencha nome, usuário e uma senha com pelo menos 6 caracteres')
+    if (form.nome.trim().length < 3 || !isValidPhone(form.telefone) || form.password.length < 6) {
+      setError('Preencha nome, um telefone válido e uma senha com pelo menos 6 caracteres')
       return
     }
 
     setSubmitting(true)
     const result = await register({
-      username: form.username,
+      telefone: form.telefone,
       password: form.password,
       nome: form.nome,
-      telefone: form.telefone,
       role: 'deputado',
       parentId: null,
     })
     setSubmitting(false)
 
     if (result.success) {
-      navigate('/', { replace: true })
+      setDone(true)
     } else {
       setError(result.error ?? 'Não foi possível criar a conta')
     }
@@ -72,11 +74,37 @@ export function Setup() {
     )
   }
 
+  if (done) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a] px-6 py-10">
+        <div className="w-full max-w-sm space-y-4">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/20">
+              <CheckCircle2 className="h-7 w-7 text-emerald-400" />
+            </div>
+            <h1 className="text-xl font-bold text-white">Conta criada!</h1>
+            <p className="text-sm text-blue-200">Você já pode usar o app.</p>
+          </div>
+
+          <InstallHint />
+
+          <button
+            type="button"
+            onClick={() => navigate('/', { replace: true })}
+            className="w-full rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition hover:bg-blue-400"
+          >
+            Continuar
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a] px-6 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-3">
-          <img src="/logo.svg" alt="HUB AlexBrasil" className="h-14 w-14 rounded-2xl" />
+          <img src="/alex-brasil.png" alt="HUB AlexBrasil" className="h-14 w-14 rounded-2xl" />
           <h1 className="text-2xl font-bold text-white">Configuração inicial</h1>
           <p className="text-center text-sm text-blue-200">
             Crie a primeira conta do sistema — o Deputado, no topo da hierarquia.
@@ -97,20 +125,14 @@ export function Setup() {
             />
           </FormField>
 
-          <FormField label="Telefone">
+          <FormField label="Telefone (vai ser seu login)">
             <input
               type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
               value={form.telefone}
-              onChange={(e) => setField('telefone', e.target.value)}
-              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-blue-200/40 outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </FormField>
-
-          <FormField label="Usuário">
-            <input
-              type="text"
-              value={form.username}
-              onChange={(e) => setField('username', e.target.value)}
+              onChange={(e) => setField('telefone', formatPhone(e.target.value))}
+              placeholder="(11) 91234-5678"
               className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-blue-200/40 outline-none focus:ring-2 focus:ring-blue-400"
             />
           </FormField>

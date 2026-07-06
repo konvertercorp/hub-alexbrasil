@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Eye, EyeOff, LogIn, User, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, LogIn, Phone, Loader2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { formatPhone } from '../utils/formatters'
 
 export function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [username, setUsername] = useState('')
+  const [telefone, setTelefone] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -19,12 +20,12 @@ export function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitting(true)
-    const { success } = await login(username, password)
+    const { success } = await login(telefone, password)
     setSubmitting(false)
     if (success) {
       navigate(redirectTo, { replace: true })
     } else {
-      setError('Usuário ou senha inválidos')
+      setError('Telefone ou senha inválidos')
     }
   }
 
@@ -32,7 +33,7 @@ export function Login() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a] px-6 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-3">
-          <img src="/logo.svg" alt="HUB AlexBrasil" className="h-14 w-14 rounded-2xl" />
+          <img src="/alex-brasil.png" alt="HUB AlexBrasil" className="h-14 w-14 rounded-2xl" />
           <h1 className="text-2xl font-bold text-white">HUB AlexBrasil</h1>
           <p className="text-sm text-blue-200">Entre com sua conta para continuar</p>
         </div>
@@ -44,22 +45,23 @@ export function Login() {
         >
           <div>
             <label className="mb-1.5 block text-sm font-medium text-blue-100">
-              Usuário
+              Telefone
             </label>
             <div className="relative">
-              <User
+              <Phone
                 size={16}
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-blue-300"
               />
               <input
-                type="text"
-                autoComplete="username"
-                value={username}
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                value={telefone}
                 onChange={(event) => {
-                  setUsername(event.target.value)
+                  setTelefone(formatPhone(event.target.value))
                   setError('')
                 }}
-                placeholder="Digite seu usuário"
+                placeholder="(11) 91234-5678"
                 className="w-full rounded-xl border border-white/20 bg-white/10 py-2.5 pl-9 pr-4 text-sm text-white placeholder-blue-200/40 outline-none transition focus:ring-2 focus:ring-blue-400"
               />
             </div>

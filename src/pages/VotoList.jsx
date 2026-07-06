@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Search, ThumbsUp, ThumbsDown, Users } from 'lucide-react'
+import { Search, ThumbsUp, ThumbsDown, Users } from 'lucide-react'
 import { Header } from '../components/Header'
 import { usePedidosVoto } from '../hooks/usePedidosVoto'
 
@@ -36,7 +35,7 @@ export function VotoList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
-      <Header appName="HUB AlexBrasil" />
+      <Header appName="HUB AlexBrasil" backTo="/votos" />
 
       <main className="px-5 py-8">
         <div className="mx-auto max-w-md">
@@ -86,39 +85,39 @@ export function VotoList() {
             )}
           </div>
 
-          <Link
-            to="/votos"
-            className="mt-6 flex items-center justify-center gap-2 text-sm font-medium text-blue-200 transition hover:text-white"
-          >
-            <ArrowLeft size={16} />
-            Voltar para Pedido de Voto
-          </Link>
         </div>
       </main>
     </div>
   )
 }
 
+const VOTO_BADGE = {
+  sim: { className: 'bg-emerald-500/20 text-emerald-300', icon: ThumbsUp, label: 'SIM' },
+  nao: { className: 'bg-red-500/20 text-red-300', icon: ThumbsDown, label: 'NÃO' },
+}
+
 function VoterCard({ pedido }) {
-  const isSim = pedido.voto === 'sim'
+  const badge = VOTO_BADGE[pedido.voto]
   return (
     <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold text-white">{pedido.nome}</p>
           <p className="mt-0.5 text-xs text-blue-200">{pedido.telefone}</p>
-          <p className="text-xs text-blue-200">{pedido.cpf}</p>
+          {pedido.cpf && <p className="text-xs text-blue-200">{pedido.cpf}</p>}
         </div>
-        <span
-          className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${
-            isSim
-              ? 'bg-emerald-500/20 text-emerald-300'
-              : 'bg-red-500/20 text-red-300'
-          }`}
-        >
-          {isSim ? <ThumbsUp size={12} /> : <ThumbsDown size={12} />}
-          {isSim ? 'SIM' : 'NÃO'}
-        </span>
+        {badge ? (
+          <span
+            className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${badge.className}`}
+          >
+            <badge.icon size={12} />
+            {badge.label}
+          </span>
+        ) : (
+          <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-blue-200">
+            Não informado
+          </span>
+        )}
       </div>
       <p className="mt-2 text-[11px] text-blue-300/70">
         {formatDate(pedido.createdAt)}

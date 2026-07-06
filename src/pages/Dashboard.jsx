@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { canAccessModule } from '../utils/roles'
 
 const MODULES = [
-  { key: 'localizacao', to: '/localizacao', label: 'Localização', icon: MapPin, color: 'blue' },
+  { key: 'localizacao', to: '/localizacao', label: 'Check-in', icon: MapPin, color: 'blue' },
   { key: 'atividades', to: '/atividades', label: 'Atividades', icon: ListChecks, color: 'purple' },
   { key: 'votos', to: '/votos', label: 'Pedido de Voto', icon: IdCard, color: 'green' },
   { key: 'noticias', to: '/noticias', label: 'Notícias', icon: Newspaper, color: 'orange' },

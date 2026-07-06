@@ -4,7 +4,6 @@ import {
   CheckCircle2,
   ThumbsUp,
   ThumbsDown,
-  ArrowLeft,
   Users,
   User,
   Tag,
@@ -51,14 +50,13 @@ const initialForm = {
   telefone: '',
   cpf: '',
   dataNascimento: '',
-  voto: null,
+  voto: 'sim',
   tipoContato: 'Eleitor',
   status: 'Registrado',
   tags: [],
   genero: null,
   ocupacao: '',
   observacoes: '',
-  enderecoAtivo: true,
   cep: '',
   logradouro: '',
   numero: '',
@@ -66,7 +64,7 @@ const initialForm = {
   municipio: '',
   uf: '',
   coordenadas: null,
-  origem: 'Gabinete / Atendimento Presencial',
+  origem: '',
 }
 
 function validate(form) {
@@ -78,7 +76,7 @@ function validate(form) {
   if (!isValidPhone(form.telefone)) {
     errors.telefone = 'Telefone inválido'
   }
-  if (!isValidCPF(form.cpf)) {
+  if (form.cpf && !isValidCPF(form.cpf)) {
     errors.cpf = 'CPF inválido'
   }
   if (!isValidDateBR(form.dataNascimento)) {
@@ -181,7 +179,7 @@ export function VotoRequest() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
-      <Header appName="HUB AlexBrasil" />
+      <Header appName="HUB AlexBrasil" backTo="/" />
 
       <main className="px-5 py-8">
         <div className="mx-auto max-w-md">
@@ -241,7 +239,7 @@ export function VotoRequest() {
                   />
                 </Field>
 
-                <Field label="CPF *" error={errors.cpf}>
+                <Field label="CPF" error={errors.cpf}>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -366,13 +364,7 @@ export function VotoRequest() {
                 </Field>
               </Section>
 
-              <Section
-                icon={MapPin}
-                title="Endereço / Geolocalização"
-                tone="red"
-                enabled={form.enderecoAtivo}
-                onToggleEnabled={(value) => setField('enderecoAtivo', value)}
-              >
+              <Section icon={MapPin} title="Endereço / Geolocalização" tone="red">
                 <Field label="CEP">
                   <div className="flex items-center gap-2">
                     <input
@@ -486,6 +478,7 @@ export function VotoRequest() {
                     onChange={(e) => setField('origem', e.target.value)}
                     className={inputClass()}
                   >
+                    <option value="" className="text-black">Selecione</option>
                     {ORIGEM_OPTIONS.map((option) => (
                       <option key={option} value={option} className="text-black">
                         {option}
@@ -505,14 +498,6 @@ export function VotoRequest() {
               </button>
             </form>
           )}
-
-          <Link
-            to="/"
-            className="mt-6 flex items-center justify-center gap-2 text-sm font-medium text-blue-200 transition hover:text-white"
-          >
-            <ArrowLeft size={16} />
-            Voltar ao início
-          </Link>
         </div>
       </main>
     </div>
@@ -547,6 +532,12 @@ function StatCard({ label, value, icon: Icon, tone }) {
   )
 }
 
+function votoLabel(voto) {
+  if (voto === 'sim') return 'SIM'
+  if (voto === 'nao') return 'NÃO'
+  return 'Não informado'
+}
+
 function ConfirmationCard({ form, onReset }) {
   return (
     <div className="mt-4 flex flex-col items-center gap-3 rounded-3xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-xl">
@@ -556,9 +547,7 @@ function ConfirmationCard({ form, onReset }) {
       <h2 className="text-lg font-bold text-white">Pedido registrado!</h2>
       <p className="text-sm text-blue-200">
         {form.nome.split(' ')[0]} —{' '}
-        <span className="font-semibold text-white">
-          {form.voto === 'sim' ? 'SIM' : 'NÃO'}
-        </span>
+        <span className="font-semibold text-white">{votoLabel(form.voto)}</span>
       </p>
       <button
         type="button"

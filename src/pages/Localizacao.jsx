@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
-  ArrowLeft,
   MapPin,
   LocateFixed,
   Loader2,
@@ -70,11 +68,11 @@ export function Localizacao() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
-      <Header appName="HUB AlexBrasil" />
+      <Header appName="HUB AlexBrasil" backTo="/" />
 
       <main className="px-5 py-8">
         <div className="mx-auto max-w-md">
-          <h1 className="text-xl font-bold text-white">Localização</h1>
+          <h1 className="text-xl font-bold text-white">Check-in</h1>
           <p className="mt-1 text-sm text-blue-200">
             Sua posição em tempo real.
           </p>
@@ -195,13 +193,6 @@ export function Localizacao() {
             )}
           </div>
 
-          <Link
-            to="/"
-            className="mt-6 flex items-center justify-center gap-2 text-sm font-medium text-blue-200 transition hover:text-white"
-          >
-            <ArrowLeft size={16} />
-            Voltar ao início
-          </Link>
         </div>
       </main>
     </div>

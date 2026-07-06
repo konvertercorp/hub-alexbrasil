@@ -15,7 +15,7 @@ export function LandingInstall() {
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2">
         {/* Coluna esquerda */}
         <div className="flex flex-col gap-6">
-          <img src="/logo.svg" alt={APP_NAME} className="h-14 w-14 rounded-2xl" />
+          <img src="/alex-brasil.png" alt={APP_NAME} className="h-14 w-14 rounded-2xl" />
 
           <div>
             <h1 className="text-4xl font-bold text-white sm:text-5xl">
