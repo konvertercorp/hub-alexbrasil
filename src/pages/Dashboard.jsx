@@ -18,7 +18,7 @@ export function Dashboard() {
   const visibleModules = MODULES.filter((module) => canAccessModule(profile?.role, module.key))
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#f2f4e6]">
       <Header appName="HUB AlexBrasil" />
 
       <main className="px-5 py-8">

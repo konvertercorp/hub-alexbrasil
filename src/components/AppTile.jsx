@@ -20,7 +20,7 @@ export function AppTile({ to, icon: Icon, label, color = 'blue' }) {
       >
         <Icon className="h-8 w-8 text-white" strokeWidth={2} />
       </div>
-      <span className="text-sm font-medium text-white">{label}</span>
+      <span className="text-sm font-medium text-gray-900">{label}</span>
     </Link>
   )
 }

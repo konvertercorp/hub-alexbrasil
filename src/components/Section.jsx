@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 
 const TONE_CLASSES = {
-  blue: 'bg-blue-500/20 text-blue-200',
-  amber: 'bg-amber-500/20 text-amber-200',
-  teal: 'bg-teal-500/20 text-teal-200',
-  red: 'bg-red-500/20 text-red-200',
-  purple: 'bg-purple-500/20 text-purple-200',
+  blue: 'bg-lime-100 text-lime-800',
+  amber: 'bg-amber-100 text-amber-800',
+  teal: 'bg-teal-100 text-teal-800',
+  red: 'bg-red-100 text-red-700',
+  purple: 'bg-purple-100 text-purple-800',
 }
 
 export function Section({
@@ -23,7 +23,7 @@ export function Section({
   const isDisabled = hasToggle && !enabled
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center gap-3 px-4 py-3">
         <div
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${TONE_CLASSES[tone]}`}
@@ -35,7 +35,7 @@ export function Section({
           onClick={() => setOpen((prev) => !prev)}
           className="flex flex-1 items-center justify-between gap-2 text-left"
         >
-          <span className="text-sm font-semibold text-white">{title}</span>
+          <span className="text-sm font-semibold text-gray-900">{title}</span>
         </button>
         {hasToggle && (
           <button
@@ -44,7 +44,7 @@ export function Section({
             aria-checked={enabled}
             onClick={() => onToggleEnabled(!enabled)}
             className={`relative h-6 w-11 shrink-0 rounded-full transition ${
-              enabled ? 'bg-emerald-500' : 'bg-white/20'
+              enabled ? 'bg-[#b8e000]' : 'bg-gray-200'
             }`}
           >
             <span
@@ -61,13 +61,13 @@ export function Section({
         >
           <ChevronDown
             size={18}
-            className={`text-blue-200 transition-transform ${open ? 'rotate-180' : ''}`}
+            className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`}
           />
         </button>
       </div>
 
       {open && !isDisabled && (
-        <div className="space-y-4 border-t border-white/10 px-4 py-4">
+        <div className="space-y-4 border-t border-gray-100 px-4 py-4">
           {children}
         </div>
       )}

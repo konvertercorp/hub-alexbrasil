@@ -178,21 +178,21 @@ export function VotoRequest() {
   const localizacaoOk = Boolean(form.bairro && form.municipio)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#f2f4e6]">
       <Header appName="HUB AlexBrasil" backTo="/" />
 
       <main className="px-5 py-8">
         <div className="mx-auto max-w-md">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-white">Pedido de Voto</h1>
-              <p className="mt-1 text-sm text-blue-200">
+              <h1 className="text-xl font-bold text-gray-900">Pedido de Voto</h1>
+              <p className="mt-1 text-sm text-gray-500">
                 Cadastre o eleitor ou liderança e registre o pedido de voto.
               </p>
             </div>
             <Link
               to="/votos/lista"
-              className="mt-1 flex shrink-0 items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20"
+              className="mt-1 flex shrink-0 items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-200"
             >
               <Users size={14} />
               Ver lista
@@ -289,7 +289,7 @@ export function VotoRequest() {
                     className={inputClass()}
                   >
                     {TIPO_CONTATO_OPTIONS.map((option) => (
-                      <option key={option} value={option} className="text-black">
+                      <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
@@ -303,7 +303,7 @@ export function VotoRequest() {
                     className={inputClass()}
                   >
                     {STATUS_OPTIONS.map((option) => (
-                      <option key={option} value={option} className="text-black">
+                      <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
@@ -321,7 +321,7 @@ export function VotoRequest() {
 
               <Section icon={NotebookPen} title="Informações Internas / CRM" tone="teal">
                 <div>
-                  <span className="mb-1.5 block text-sm font-medium text-blue-100">
+                  <span className="mb-1.5 block text-sm font-medium text-gray-700">
                     Gênero
                   </span>
                   <div className="flex flex-wrap gap-2">
@@ -377,7 +377,7 @@ export function VotoRequest() {
                       className={inputClass()}
                     />
                     {cepLoading && (
-                      <Loader2 size={16} className="shrink-0 animate-spin text-blue-300" />
+                      <Loader2 size={16} className="shrink-0 animate-spin text-gray-400" />
                     )}
                   </div>
                 </Field>
@@ -416,9 +416,9 @@ export function VotoRequest() {
                     onChange={(e) => setField('uf', e.target.value)}
                     className={inputClass()}
                   >
-                    <option value="" className="text-black">Selecione</option>
+                    <option value="">Selecione</option>
                     {UF_LIST.map((uf) => (
-                      <option key={uf.sigla} value={uf.sigla} className="text-black">
+                      <option key={uf.sigla} value={uf.sigla}>
                         {uf.nome}
                       </option>
                     ))}
@@ -435,24 +435,24 @@ export function VotoRequest() {
                   />
                 </Field>
 
-                <div className="flex flex-col gap-2 border-t border-white/10 pt-3">
-                  <p className="text-xs text-blue-200/70">
+                <div className="flex flex-col gap-2 border-t border-gray-100 pt-3">
+                  <p className="text-xs text-gray-400">
                     * Bairro e Cidade são essenciais para o mapa de calor político.
                   </p>
                   <div className="flex items-center justify-between gap-2">
                     {localizacaoOk ? (
-                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-300">
+                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
                         <CheckCircle size={14} />
                         Localização OK
                       </span>
                     ) : (
-                      <span className="text-xs text-blue-200/50">Localização incompleta</span>
+                      <span className="text-xs text-gray-400">Localização incompleta</span>
                     )}
                     <button
                       type="button"
                       onClick={handleBuscarCoordenadas}
                       disabled={coordLoading}
-                      className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
+                      className="flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-200 disabled:opacity-50"
                     >
                       {coordLoading ? (
                         <Loader2 size={14} className="animate-spin" />
@@ -462,9 +462,9 @@ export function VotoRequest() {
                       Buscar Coordenadas
                     </button>
                   </div>
-                  {coordError && <p className="text-xs text-red-300">{coordError}</p>}
+                  {coordError && <p className="text-xs text-red-600">{coordError}</p>}
                   {form.coordenadas && (
-                    <p className="text-xs text-emerald-300">
+                    <p className="text-xs text-emerald-600">
                       {form.coordenadas.lat.toFixed(5)}, {form.coordenadas.lng.toFixed(5)}
                     </p>
                   )}
@@ -478,9 +478,9 @@ export function VotoRequest() {
                     onChange={(e) => setField('origem', e.target.value)}
                     className={inputClass()}
                   >
-                    <option value="" className="text-black">Selecione</option>
+                    <option value="">Selecione</option>
                     {ORIGEM_OPTIONS.map((option) => (
-                      <option key={option} value={option} className="text-black">
+                      <option key={option} value={option}>
                         {option}
                       </option>
                     ))}
@@ -488,11 +488,11 @@ export function VotoRequest() {
                 </Field>
               </Section>
 
-              {submitError && <p className="text-sm text-red-300">{submitError}</p>}
+              {submitError && <p className="text-sm text-red-600">{submitError}</p>}
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition hover:bg-blue-400"
+                className="w-full rounded-xl bg-[#b8e000] py-3 text-sm font-semibold text-gray-900 transition hover:bg-[#a3cc00]"
               >
                 Registrar pedido
               </button>
@@ -515,18 +515,18 @@ function StatsBar({ stats }) {
 }
 
 const STAT_TONES = {
-  blue: 'bg-blue-500/20 text-blue-200',
-  green: 'bg-emerald-500/20 text-emerald-300',
-  red: 'bg-red-500/20 text-red-300',
+  blue: 'bg-lime-50 text-lime-800 border-lime-200',
+  green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  red: 'bg-red-50 text-red-700 border-red-200',
 }
 
 function StatCard({ label, value, icon: Icon, tone }) {
   return (
     <div
-      className={`flex flex-col items-center gap-1 rounded-2xl border border-white/10 py-3 ${STAT_TONES[tone]}`}
+      className={`flex flex-col items-center gap-1 rounded-2xl border py-3 ${STAT_TONES[tone]}`}
     >
       <Icon size={16} />
-      <span className="text-lg font-bold text-white">{value}</span>
+      <span className="text-lg font-bold text-gray-900">{value}</span>
       <span className="text-xs">{label}</span>
     </div>
   )
@@ -540,19 +540,19 @@ function votoLabel(voto) {
 
 function ConfirmationCard({ form, onReset }) {
   return (
-    <div className="mt-4 flex flex-col items-center gap-3 rounded-3xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-xl">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20">
-        <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+    <div className="mt-4 flex flex-col items-center gap-3 rounded-3xl border border-gray-200 bg-white p-6 text-center shadow-sm">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50">
+        <CheckCircle2 className="h-6 w-6 text-emerald-600" />
       </div>
-      <h2 className="text-lg font-bold text-white">Pedido registrado!</h2>
-      <p className="text-sm text-blue-200">
+      <h2 className="text-lg font-bold text-gray-900">Pedido registrado!</h2>
+      <p className="text-sm text-gray-500">
         {form.nome.split(' ')[0]} —{' '}
-        <span className="font-semibold text-white">{votoLabel(form.voto)}</span>
+        <span className="font-semibold text-gray-900">{votoLabel(form.voto)}</span>
       </p>
       <button
         type="button"
         onClick={onReset}
-        className="mt-2 w-full rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition hover:bg-blue-400"
+        className="mt-2 w-full rounded-xl bg-[#b8e000] py-3 text-sm font-semibold text-gray-900 transition hover:bg-[#a3cc00]"
       >
         Registrar próximo eleitor
       </button>
@@ -563,33 +563,33 @@ function ConfirmationCard({ form, onReset }) {
 function Field({ label, error, children }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-blue-100">
+      <label className="mb-1.5 block text-sm font-medium text-gray-700">
         {label}
       </label>
       {children}
-      {error && <p className="mt-1 text-xs text-red-300">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   )
 }
 
 function inputClass(error) {
-  return `w-full rounded-xl border bg-white/10 px-4 py-2.5 text-sm text-white placeholder-blue-200/40 outline-none transition focus:ring-2 focus:ring-blue-400 ${
-    error ? 'border-red-400/70' : 'border-white/20'
+  return `w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000] ${
+    error ? 'border-red-400' : 'border-gray-300'
   }`
 }
 
 function VoteButton({ active, onClick, icon: Icon, label, variant }) {
   const activeClasses =
     variant === 'green'
-      ? 'border-emerald-400 bg-emerald-500/30 text-emerald-300'
-      : 'border-red-400 bg-red-500/30 text-red-300'
+      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
+      : 'border-red-400 bg-red-50 text-red-700'
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 text-sm font-semibold transition ${
-        active ? activeClasses : 'border-white/20 bg-white/5 text-blue-100'
+        active ? activeClasses : 'border-gray-200 bg-gray-50 text-gray-500'
       }`}
     >
       <Icon size={18} />
@@ -605,8 +605,8 @@ function GeneroPill({ active, onClick, label }) {
       onClick={onClick}
       className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
         active
-          ? 'bg-emerald-500 text-white'
-          : 'bg-white/10 text-blue-200 hover:bg-white/20'
+          ? 'bg-[#b8e000] text-gray-900'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
       }`}
     >
       {label}

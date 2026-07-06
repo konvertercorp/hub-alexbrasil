@@ -34,27 +34,27 @@ export function VotoList() {
   }, [pedidos, search, filter])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#f2f4e6]">
       <Header appName="HUB AlexBrasil" backTo="/votos" />
 
       <main className="px-5 py-8">
         <div className="mx-auto max-w-md">
-          <h1 className="text-xl font-bold text-white">Eleitores registrados</h1>
-          <p className="mt-1 text-sm text-blue-200">
+          <h1 className="text-xl font-bold text-gray-900">Eleitores registrados</h1>
+          <p className="mt-1 text-sm text-gray-500">
             {stats.total} pedidos · {stats.sim} sim · {stats.nao} não
           </p>
 
           <div className="relative mt-4">
             <Search
               size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-blue-300"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
             />
             <input
               type="text"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar por nome..."
-              className="w-full rounded-xl border border-white/20 bg-white/10 py-2.5 pl-9 pr-4 text-sm text-white placeholder-blue-200/40 outline-none transition focus:ring-2 focus:ring-blue-400"
+              className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000]"
             />
           </div>
 
@@ -66,8 +66,8 @@ export function VotoList() {
                 onClick={() => setFilter(key)}
                 className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
                   filter === key
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white/10 text-blue-200 hover:bg-white/20'
+                    ? 'bg-[#b8e000] text-gray-900'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {label}
@@ -92,19 +92,19 @@ export function VotoList() {
 }
 
 const VOTO_BADGE = {
-  sim: { className: 'bg-emerald-500/20 text-emerald-300', icon: ThumbsUp, label: 'SIM' },
-  nao: { className: 'bg-red-500/20 text-red-300', icon: ThumbsDown, label: 'NÃO' },
+  sim: { className: 'bg-emerald-50 text-emerald-700', icon: ThumbsUp, label: 'SIM' },
+  nao: { className: 'bg-red-50 text-red-700', icon: ThumbsDown, label: 'NÃO' },
 }
 
 function VoterCard({ pedido }) {
   const badge = VOTO_BADGE[pedido.voto]
   return (
-    <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-semibold text-white">{pedido.nome}</p>
-          <p className="mt-0.5 text-xs text-blue-200">{pedido.telefone}</p>
-          {pedido.cpf && <p className="text-xs text-blue-200">{pedido.cpf}</p>}
+          <p className="font-semibold text-gray-900">{pedido.nome}</p>
+          <p className="mt-0.5 text-xs text-gray-500">{pedido.telefone}</p>
+          {pedido.cpf && <p className="text-xs text-gray-500">{pedido.cpf}</p>}
         </div>
         {badge ? (
           <span
@@ -114,12 +114,12 @@ function VoterCard({ pedido }) {
             {badge.label}
           </span>
         ) : (
-          <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-blue-200">
+          <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
             Não informado
           </span>
         )}
       </div>
-      <p className="mt-2 text-[11px] text-blue-300/70">
+      <p className="mt-2 text-[11px] text-gray-400">
         {formatDate(pedido.createdAt)}
       </p>
     </div>
@@ -128,9 +128,9 @@ function VoterCard({ pedido }) {
 
 function EmptyState({ hasPedidos }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-10 text-center">
-      <Users className="h-8 w-8 text-blue-300" />
-      <p className="text-sm text-blue-200">
+    <div className="flex flex-col items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 py-10 text-center">
+      <Users className="h-8 w-8 text-gray-400" />
+      <p className="text-sm text-gray-500">
         {hasPedidos
           ? 'Nenhum eleitor encontrado para essa busca.'
           : 'Nenhum pedido de voto registrado ainda.'}

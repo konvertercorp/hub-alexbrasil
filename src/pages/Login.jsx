@@ -30,27 +30,27 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a] px-6 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white to-[#f2f4e6] px-6 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-3">
           <img src="/alex-brasil.png" alt="HUB AlexBrasil" className="h-14 w-14 rounded-2xl" />
-          <h1 className="text-2xl font-bold text-white">HUB AlexBrasil</h1>
-          <p className="text-sm text-blue-200">Entre com sua conta para continuar</p>
+          <h1 className="text-2xl font-bold text-gray-900">HUB AlexBrasil</h1>
+          <p className="text-sm text-gray-500">Entre com sua conta para continuar</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="mt-6 space-y-4 rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-xl"
+          className="mt-6 space-y-4 rounded-3xl border border-gray-200 bg-white p-6 shadow-xl"
         >
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-blue-100">
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
               Telefone
             </label>
             <div className="relative">
               <Phone
                 size={16}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-blue-300"
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
                 type="tel"
@@ -62,13 +62,13 @@ export function Login() {
                   setError('')
                 }}
                 placeholder="(11) 91234-5678"
-                className="w-full rounded-xl border border-white/20 bg-white/10 py-2.5 pl-9 pr-4 text-sm text-white placeholder-blue-200/40 outline-none transition focus:ring-2 focus:ring-blue-400"
+                className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000]"
               />
             </div>
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-blue-100">
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">
               Senha
             </label>
             <div className="relative">
@@ -81,25 +81,25 @@ export function Login() {
                   setError('')
                 }}
                 placeholder="Digite sua senha"
-                className="w-full rounded-xl border border-white/20 bg-white/10 py-2.5 pl-4 pr-10 text-sm text-white placeholder-blue-200/40 outline-none transition focus:ring-2 focus:ring-blue-400"
+                className="w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-300 transition hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-gray-900"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
-          {error && <p className="text-xs text-red-300">{error}</p>}
+          {error && <p className="text-xs text-red-600">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition hover:bg-blue-400 disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#b8e000] py-3 text-sm font-semibold text-gray-900 transition hover:bg-[#a3cc00] disabled:opacity-60"
           >
             {submitting ? (
               <Loader2 size={16} className="animate-spin" />

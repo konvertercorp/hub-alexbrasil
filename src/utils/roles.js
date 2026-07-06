@@ -1,6 +1,7 @@
 export const ROLE_LABELS = {
   deputado: 'Deputado',
   lider: 'Líder',
+  admin: 'Admin',
 }
 
 // Toda conta criada por convite entra como Líder — "Apoiador" não é mais

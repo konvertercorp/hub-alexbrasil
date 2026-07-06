@@ -22,9 +22,9 @@ export function QRCodeCard({ appName = 'HUB AlexBrasil' }) {
   }
 
   return (
-    <div className="rounded-3xl border border-white/20 bg-blue-400/10 p-6 sm:p-8 backdrop-blur-lg shadow-2xl">
+    <div className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 shadow-xl">
       <div className="flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2 text-blue-100">
+        <div className="flex items-center gap-2 text-gray-500">
           <ScanLine size={22} />
           <span className="text-sm font-medium uppercase tracking-wide">
             Escaneie para acessar
@@ -32,7 +32,7 @@ export function QRCodeCard({ appName = 'HUB AlexBrasil' }) {
         </div>
 
         {isLocalOnly && (
-          <div className="flex items-start gap-2 rounded-xl border border-amber-400/40 bg-amber-500/15 px-3 py-2 text-left text-xs text-amber-200">
+          <div className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-left text-xs text-amber-800">
             <TriangleAlert size={14} className="mt-0.5 shrink-0" />
             <span>
               Você está em <strong>localhost</strong> — o celular não vai
@@ -43,31 +43,31 @@ export function QRCodeCard({ appName = 'HUB AlexBrasil' }) {
           </div>
         )}
 
-        <div className="rounded-2xl border-2 border-dashed border-white/40 p-4">
+        <div className="rounded-2xl border-2 border-dashed border-gray-300 p-4">
           <div className="rounded-xl bg-white p-3">
             <QRCodeSVG
               value={url}
               size={200}
               bgColor="#ffffff"
-              fgColor="#0a1a4a"
+              fgColor="#111827"
               level="M"
               className="rounded-lg"
             />
           </div>
         </div>
 
-        <p className="text-center text-sm text-blue-100">
+        <p className="text-center text-sm text-gray-500">
           Aponte a câmera do celular
         </p>
 
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-blue-100 transition hover:bg-white/20"
+          className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-200"
         >
           {copied ? (
             <>
-              <Check size={14} className="text-emerald-300" />
+              <Check size={14} className="text-emerald-600" />
               Link copiado!
             </>
           ) : (
@@ -106,13 +106,13 @@ function Step({ number, title, description, highlight = false }) {
     <div
       className={`flex gap-3 rounded-xl p-3 ${
         highlight
-          ? 'border border-emerald-400/40 bg-emerald-500/20'
-          : 'bg-white/10'
+          ? 'border border-emerald-200 bg-emerald-50'
+          : 'bg-gray-50'
       }`}
     >
       <div
         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-          highlight ? 'bg-emerald-400 text-emerald-950' : 'bg-white/20 text-white'
+          highlight ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-700'
         }`}
       >
         {number}
@@ -120,12 +120,12 @@ function Step({ number, title, description, highlight = false }) {
       <div className="text-left">
         <p
           className={`text-sm font-semibold ${
-            highlight ? 'text-emerald-300' : 'text-white'
+            highlight ? 'text-emerald-700' : 'text-gray-900'
           }`}
         >
           {title}
         </p>
-        <p className="text-xs text-blue-100/90">{description}</p>
+        <p className="text-xs text-gray-500">{description}</p>
       </div>
     </div>
   )

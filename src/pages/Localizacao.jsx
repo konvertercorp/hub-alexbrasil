@@ -67,28 +67,28 @@ export function Localizacao() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
+    <div className="min-h-screen bg-gradient-to-br from-white to-[#f2f4e6]">
       <Header appName="HUB AlexBrasil" backTo="/" />
 
       <main className="px-5 py-8">
         <div className="mx-auto max-w-md">
-          <h1 className="text-xl font-bold text-white">Check-in</h1>
-          <p className="mt-1 text-sm text-blue-200">
+          <h1 className="text-xl font-bold text-gray-900">Check-in</h1>
+          <p className="mt-1 text-sm text-gray-500">
             Sua posição em tempo real.
           </p>
 
-          <div className="mt-4 overflow-hidden rounded-2xl border border-white/15">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200">
             {position ? (
               <LiveMap position={position} accuracy={accuracy} />
             ) : (
-              <div className="flex h-64 w-full items-center justify-center bg-white/5">
+              <div className="flex h-64 w-full items-center justify-center bg-gray-50">
                 {loading ? (
-                  <div className="flex flex-col items-center gap-2 text-blue-200">
+                  <div className="flex flex-col items-center gap-2 text-gray-500">
                     <Loader2 className="h-6 w-6 animate-spin" />
                     <span className="text-sm">Obtendo localização...</span>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 px-6 text-center text-sm text-red-300">
+                  <div className="flex flex-col items-center gap-2 px-6 text-center text-sm text-red-600">
                     <MapPin className="h-6 w-6" />
                     {error}
                   </div>
@@ -98,7 +98,7 @@ export function Localizacao() {
           </div>
 
           {position && (
-            <div className="mt-3 flex items-center justify-between text-xs text-blue-200">
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
               <span className="flex items-center gap-1.5">
                 <LocateFixed size={14} />
                 {position.lat.toFixed(5)}, {position.lng.toFixed(5)}
@@ -118,15 +118,15 @@ export function Localizacao() {
               type="button"
               onClick={openCheckin}
               disabled={!position}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#b8e000] py-3 text-sm font-semibold text-gray-900 transition hover:bg-[#a3cc00] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <MapPin size={16} />
               Fazer check-in
             </button>
           ) : (
-            <div className="mt-4 space-y-3 rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-xl">
+            <div className="mt-4 space-y-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-blue-100">
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">
                   Nome do local ou evento
                 </label>
                 <input
@@ -134,18 +134,18 @@ export function Localizacao() {
                   value={eventName}
                   onChange={(event) => setEventName(event.target.value)}
                   placeholder="Ex: Comício Bairro Central"
-                  className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-blue-200/40 outline-none transition focus:ring-2 focus:ring-blue-400"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000]"
                 />
                 {formError && (
-                  <p className="mt-1 text-xs text-red-300">{formError}</p>
+                  <p className="mt-1 text-xs text-red-600">{formError}</p>
                 )}
               </div>
 
               <div>
-                <span className="mb-1.5 block text-sm font-medium text-blue-100">
+                <span className="mb-1.5 block text-sm font-medium text-gray-700">
                   Endereço
                 </span>
-                <p className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-blue-200">
+                <p className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-500">
                   {addressLoading ? (
                     <>
                       <Loader2 size={14} className="animate-spin" />
@@ -161,14 +161,14 @@ export function Localizacao() {
                 <button
                   type="button"
                   onClick={() => setIsCheckinOpen(false)}
-                  className="flex-1 rounded-xl bg-white/10 py-2.5 text-sm font-medium text-white transition hover:bg-white/20"
+                  className="flex-1 rounded-xl bg-gray-100 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-200"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmCheckin}
-                  className="flex-1 rounded-xl bg-blue-500 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-400"
+                  className="flex-1 rounded-xl bg-[#b8e000] py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-[#a3cc00]"
                 >
                   Confirmar
                 </button>
@@ -176,12 +176,12 @@ export function Localizacao() {
             </div>
           )}
 
-          <h2 className="mt-8 text-sm font-semibold text-blue-100">
+          <h2 className="mt-8 text-sm font-semibold text-gray-700">
             Check-ins recentes
           </h2>
           <div className="mt-3 space-y-3">
             {checkins.length === 0 ? (
-              <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-blue-200">
+              <p className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-500">
                 Nenhum check-in registrado ainda.
               </p>
             ) : (
@@ -201,13 +201,13 @@ export function Localizacao() {
 
 function CheckinCard({ checkin }) {
   return (
-    <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-xl">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex items-start gap-2">
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
         <div>
-          <p className="font-semibold text-white">{checkin.nome}</p>
-          <p className="mt-0.5 text-xs text-blue-200">{checkin.endereco}</p>
-          <p className="mt-1 text-[11px] text-blue-300/70">
+          <p className="font-semibold text-gray-900">{checkin.nome}</p>
+          <p className="mt-0.5 text-xs text-gray-500">{checkin.endereco}</p>
+          <p className="mt-1 text-[11px] text-gray-400">
             {formatDate(checkin.createdAt)}
           </p>
         </div>

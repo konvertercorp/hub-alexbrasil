@@ -17,8 +17,8 @@ export function MunicipioSelect({ value, onChange, options, disabled, loading })
       <div
         className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm ${
           disabled
-            ? 'border-white/10 bg-white/5 text-blue-200/40'
-            : 'border-white/20 bg-white/10 text-white'
+            ? 'border-gray-200 bg-gray-50 text-gray-400'
+            : 'border-gray-300 bg-white text-gray-900'
         }`}
       >
         <input
@@ -37,7 +37,7 @@ export function MunicipioSelect({ value, onChange, options, disabled, loading })
                 ? 'Carregando municípios...'
                 : 'Buscar município'
           }
-          className="flex-1 bg-transparent outline-none placeholder-blue-200/40"
+          className="flex-1 bg-transparent outline-none placeholder-gray-400"
         />
         {value && !disabled && (
           <button
@@ -51,7 +51,7 @@ export function MunicipioSelect({ value, onChange, options, disabled, loading })
             <X size={14} />
           </button>
         )}
-        <ChevronDown size={14} className="text-blue-300" />
+        <ChevronDown size={14} className="text-gray-400" />
       </div>
 
       {open && !disabled && (
@@ -60,9 +60,9 @@ export function MunicipioSelect({ value, onChange, options, disabled, loading })
             className="fixed inset-0 z-10"
             onClick={() => setOpen(false)}
           />
-          <ul className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-white/20 bg-[#132a6b] py-1 shadow-2xl">
+          <ul className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white py-1 shadow-lg">
             {filtered.length === 0 ? (
-              <li className="px-4 py-2 text-sm text-blue-200/60">
+              <li className="px-4 py-2 text-sm text-gray-400">
                 Nenhum município encontrado
               </li>
             ) : (
@@ -74,7 +74,7 @@ export function MunicipioSelect({ value, onChange, options, disabled, loading })
                       onChange(name)
                       setOpen(false)
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10"
+                    className="w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-lime-50"
                   >
                     {name}
                   </button>

@@ -26,12 +26,12 @@ export function TagInput({ tags, onChange, placeholder }) {
   }
 
   return (
-    <div className="w-full rounded-xl border border-white/20 bg-white/10 px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+    <div className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-[#b8e000]">
       <div className="flex flex-wrap gap-1.5">
         {tags.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1 rounded-full bg-blue-500/30 px-2.5 py-1 text-xs font-medium text-blue-100"
+            className="flex items-center gap-1 rounded-full bg-lime-100 px-2.5 py-1 text-xs font-medium text-lime-800"
           >
             {tag}
             <button
@@ -50,7 +50,7 @@ export function TagInput({ tags, onChange, placeholder }) {
           onKeyDown={handleKeyDown}
           onBlur={addTag}
           placeholder={tags.length === 0 ? placeholder : ''}
-          className="min-w-[100px] flex-1 bg-transparent py-1 text-sm text-white placeholder-blue-200/40 outline-none"
+          className="min-w-[100px] flex-1 bg-transparent py-1 text-base text-gray-900 placeholder-gray-400 outline-none"
         />
       </div>
     </div>

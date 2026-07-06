@@ -8,8 +8,8 @@ export function RequireAuth({ children }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#0a1a4a] to-[#1e3a8a]">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-200" />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-white to-[#f2f4e6]">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     )
   }
