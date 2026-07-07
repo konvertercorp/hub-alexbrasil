@@ -13,14 +13,14 @@ export function AppTile({ to, icon: Icon, label, color = 'blue' }) {
   return (
     <Link
       to={to}
-      className="flex flex-col items-center gap-2 text-center active:scale-95 transition-transform"
+      className="flex flex-col items-center gap-1.5 text-center active:scale-95 transition-transform"
     >
       <div
-        className={`flex aspect-square w-full items-center justify-center rounded-2xl shadow-lg ${COLOR_CLASSES[color] ?? COLOR_CLASSES.blue}`}
+        className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] shadow-md ${COLOR_CLASSES[color] ?? COLOR_CLASSES.blue}`}
       >
-        <Icon className="h-8 w-8 text-white" strokeWidth={2} />
+        <Icon className="h-7 w-7 text-white" strokeWidth={2} />
       </div>
-      <span className="text-sm font-medium text-gray-900">{label}</span>
+      <span className="text-xs font-medium text-gray-900">{label}</span>
     </Link>
   )
 }

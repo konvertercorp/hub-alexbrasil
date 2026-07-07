@@ -41,8 +41,8 @@ export function LandingInstall() {
               Acesse pelo celular
             </h2>
             <p className="mt-3 text-center text-sm leading-relaxed text-gray-500">
-              O {APP_NAME} foi projetado para funcionar como um aplicativo no
-              seu smartphone. Para começar, aponte a câmera do celular para o
+              O {APP_NAME} foi projetado para funcionar direto no seu
+              smartphone. Para começar, aponte a câmera do celular para o
               QR Code ao lado.
             </p>
 

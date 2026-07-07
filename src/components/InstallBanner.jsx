@@ -8,14 +8,14 @@ export function InstallBanner({ appName = 'HUB AlexBrasil', onInstall, onDismiss
           <Smartphone className="h-5 w-5 text-lime-700" />
         </div>
         <p className="flex-1 text-sm text-gray-900">
-          Instale o {appName} no seu celular!
+          Adicione o {appName} à tela inicial do seu celular!
         </p>
         <button
           type="button"
           onClick={onInstall}
           className="shrink-0 rounded-lg bg-[#b8e000] px-4 py-2 text-sm font-semibold text-gray-900 transition hover:bg-[#a3cc00]"
         >
-          Instalar
+          Adicionar
         </button>
         <button
           type="button"

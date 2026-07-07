@@ -1,48 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  CheckCircle2,
-  ThumbsUp,
-  ThumbsDown,
-  Users,
-  User,
-  Tag,
-  NotebookPen,
-  MapPin,
-  Briefcase,
-  Loader2,
-  CheckCircle,
-  Search,
-} from 'lucide-react'
+import { CheckCircle2, ThumbsUp, ThumbsDown, Users } from 'lucide-react'
 import { Header } from '../components/Header'
-import { Section } from '../components/Section'
-import { TagInput } from '../components/TagInput'
-import { MunicipioSelect } from '../components/MunicipioSelect'
+import { PedidoVotoFields } from '../components/PedidoVotoFields'
 import { usePedidosVoto } from '../hooks/usePedidosVoto'
 import { useMunicipios } from '../hooks/useMunicipios'
-import { UF_LIST } from '../utils/ufs'
-import { fetchAddressByCep } from '../utils/viacep'
-import { forwardGeocode } from '../utils/geocoding'
-import {
-  formatPhone,
-  isValidPhone,
-  formatCPF,
-  isValidCPF,
-  formatCEP,
-  formatDateBR,
-  isValidDateBR,
-} from '../utils/formatters'
-
-const TIPO_CONTATO_OPTIONS = ['Eleitor', 'Liderança', 'Apoiador', 'Voluntário', 'Doador']
-const STATUS_OPTIONS = ['Registrado', 'Contatado', 'Confirmado', 'Indeciso', 'Inativo']
-const ORIGEM_OPTIONS = [
-  'Gabinete / Atendimento Presencial',
-  'Evento',
-  'Porta a Porta',
-  'Indicação',
-  'Redes Sociais',
-  'Outro',
-]
+import { useAddressLookup } from '../hooks/useAddressLookup'
+import { validatePedidoVoto } from '../utils/pedidoVotoValidation'
 
 const initialForm = {
   nome: '',
@@ -67,36 +31,11 @@ const initialForm = {
   origem: '',
 }
 
-function validate(form) {
-  const errors = {}
-
-  if (form.nome.trim().length < 3) {
-    errors.nome = 'Informe o nome completo'
-  }
-  if (!isValidPhone(form.telefone)) {
-    errors.telefone = 'Telefone inválido'
-  }
-  if (form.cpf && !isValidCPF(form.cpf)) {
-    errors.cpf = 'CPF inválido'
-  }
-  if (!isValidDateBR(form.dataNascimento)) {
-    errors.dataNascimento = 'Data de nascimento inválida'
-  }
-  if (!form.voto) {
-    errors.voto = 'Selecione uma opção'
-  }
-
-  return errors
-}
-
 export function VotoRequest() {
   const { stats, addPedido } = usePedidosVoto()
   const [form, setForm] = useState(initialForm)
   const [errors, setErrors] = useState({})
   const [lastSubmitted, setLastSubmitted] = useState(null)
-  const [cepLoading, setCepLoading] = useState(false)
-  const [coordLoading, setCoordLoading] = useState(false)
-  const [coordError, setCoordError] = useState('')
   const [submitError, setSubmitError] = useState('')
 
   const { municipios, loading: municipiosLoading } = useMunicipios(form.uf)
@@ -105,56 +44,12 @@ export function VotoRequest() {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleVoto = (voto) => setField('voto', voto)
-
-  const handleCepBlur = async () => {
-    if (form.cep.replace(/\D/g, '').length !== 8) return
-    setCepLoading(true)
-    try {
-      const address = await fetchAddressByCep(form.cep)
-      if (address) {
-        setForm((prev) => ({
-          ...prev,
-          logradouro: address.logradouro || prev.logradouro,
-          bairro: address.bairro || prev.bairro,
-          uf: address.uf || prev.uf,
-          municipio: address.municipio || prev.municipio,
-        }))
-      }
-    } catch {
-      // CEP não encontrado — usuário preenche manualmente
-    } finally {
-      setCepLoading(false)
-    }
-  }
-
-  const handleBuscarCoordenadas = async () => {
-    const query = [form.logradouro, form.numero, form.bairro, form.municipio, form.uf, 'Brasil']
-      .filter(Boolean)
-      .join(', ')
-    if (!form.bairro || !form.municipio) {
-      setCoordError('Preencha bairro e município para buscar')
-      return
-    }
-    setCoordLoading(true)
-    setCoordError('')
-    try {
-      const result = await forwardGeocode(query)
-      if (result) {
-        setField('coordenadas', result)
-      } else {
-        setCoordError('Coordenadas não encontradas')
-      }
-    } catch {
-      setCoordError('Falha ao buscar coordenadas')
-    } finally {
-      setCoordLoading(false)
-    }
-  }
+  const { cepLoading, coordLoading, coordError, handleCepBlur, handleBuscarCoordenadas } =
+    useAddressLookup(form, setField)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const validationErrors = validate(form)
+    const validationErrors = validatePedidoVoto(form)
     setErrors(validationErrors)
     if (Object.keys(validationErrors).length > 0) return
 
@@ -170,12 +65,9 @@ export function VotoRequest() {
   const handleReset = () => {
     setForm(initialForm)
     setErrors({})
-    setCoordError('')
     setSubmitError('')
     setLastSubmitted(null)
   }
-
-  const localizacaoOk = Boolean(form.bairro && form.municipio)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-[#f2f4e6]">
@@ -205,288 +97,18 @@ export function VotoRequest() {
             <ConfirmationCard form={lastSubmitted} onReset={handleReset} />
           ) : (
             <form onSubmit={handleSubmit} noValidate className="mt-4 space-y-3">
-              <Section icon={User} title="Dados Básicos (Obrigatório)" tone="blue" defaultOpen>
-                <Field label="Nome completo *" error={errors.nome}>
-                  <input
-                    type="text"
-                    autoComplete="name"
-                    value={form.nome}
-                    onChange={(e) => setField('nome', e.target.value)}
-                    placeholder="Ex: João da Silva Santos"
-                    className={inputClass(errors.nome)}
-                  />
-                </Field>
-
-                <Field label="Apelido">
-                  <input
-                    type="text"
-                    value={form.apelido}
-                    onChange={(e) => setField('apelido', e.target.value)}
-                    placeholder="Como gosta de ser chamado"
-                    className={inputClass()}
-                  />
-                </Field>
-
-                <Field label="WhatsApp / Telefone *" error={errors.telefone}>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel"
-                    value={form.telefone}
-                    onChange={(e) => setField('telefone', formatPhone(e.target.value))}
-                    placeholder="(11) 91234-5678"
-                    className={inputClass(errors.telefone)}
-                  />
-                </Field>
-
-                <Field label="CPF" error={errors.cpf}>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={form.cpf}
-                    onChange={(e) => setField('cpf', formatCPF(e.target.value))}
-                    placeholder="123.456.789-00"
-                    className={inputClass(errors.cpf)}
-                  />
-                </Field>
-
-                <Field label="Data de nascimento *" error={errors.dataNascimento}>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={form.dataNascimento}
-                    onChange={(e) => setField('dataNascimento', formatDateBR(e.target.value))}
-                    placeholder="DD/MM/AAAA"
-                    className={inputClass(errors.dataNascimento)}
-                  />
-                </Field>
-
-                <Field label="O eleitor confirmou o voto? *" error={errors.voto}>
-                  <div className="grid grid-cols-2 gap-3">
-                    <VoteButton
-                      active={form.voto === 'sim'}
-                      onClick={() => handleVoto('sim')}
-                      icon={ThumbsUp}
-                      label="Sim"
-                      variant="green"
-                    />
-                    <VoteButton
-                      active={form.voto === 'nao'}
-                      onClick={() => handleVoto('nao')}
-                      icon={ThumbsDown}
-                      label="Não"
-                      variant="red"
-                    />
-                  </div>
-                </Field>
-              </Section>
-
-              <Section icon={Tag} title="Qualificação & Segmentação" tone="amber">
-                <Field label="Tipo de contato">
-                  <select
-                    value={form.tipoContato}
-                    onChange={(e) => setField('tipoContato', e.target.value)}
-                    className={inputClass()}
-                  >
-                    {TIPO_CONTATO_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="Status">
-                  <select
-                    value={form.status}
-                    onChange={(e) => setField('status', e.target.value)}
-                    className={inputClass()}
-                  >
-                    {STATUS_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="Tags (pressione Enter para criar)">
-                  <TagInput
-                    tags={form.tags}
-                    onChange={(tags) => setField('tags', tags)}
-                    placeholder="Ex: Saúde, Liderança, Professor..."
-                  />
-                </Field>
-              </Section>
-
-              <Section icon={NotebookPen} title="Informações Internas / CRM" tone="teal">
-                <div>
-                  <span className="mb-1.5 block text-sm font-medium text-gray-700">
-                    Gênero
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    <GeneroPill
-                      active={form.genero === null}
-                      onClick={() => setField('genero', null)}
-                      label="Não informado"
-                    />
-                    <GeneroPill
-                      active={form.genero === 'homem'}
-                      onClick={() => setField('genero', 'homem')}
-                      label="Homem"
-                    />
-                    <GeneroPill
-                      active={form.genero === 'mulher'}
-                      onClick={() => setField('genero', 'mulher')}
-                      label="Mulher"
-                    />
-                  </div>
-                </div>
-
-                <Field label="Ocupação">
-                  <input
-                    type="text"
-                    value={form.ocupacao}
-                    onChange={(e) => setField('ocupacao', e.target.value)}
-                    placeholder="Ex: Enfermeiro, Professor, Comerciante"
-                    className={inputClass()}
-                  />
-                </Field>
-
-                <Field label="Observações">
-                  <textarea
-                    value={form.observacoes}
-                    onChange={(e) => setField('observacoes', e.target.value)}
-                    placeholder="Pedidos, histórico, problemas relatados..."
-                    rows={3}
-                    className={inputClass()}
-                  />
-                </Field>
-              </Section>
-
-              <Section icon={MapPin} title="Endereço / Geolocalização" tone="red">
-                <Field label="CEP">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={form.cep}
-                      onChange={(e) => setField('cep', formatCEP(e.target.value))}
-                      onBlur={handleCepBlur}
-                      placeholder="00000-000"
-                      className={inputClass()}
-                    />
-                    {cepLoading && (
-                      <Loader2 size={16} className="shrink-0 animate-spin text-gray-400" />
-                    )}
-                  </div>
-                </Field>
-
-                <Field label="Rua/Logradouro">
-                  <input
-                    type="text"
-                    value={form.logradouro}
-                    onChange={(e) => setField('logradouro', e.target.value)}
-                    className={inputClass()}
-                  />
-                </Field>
-
-                <Field label="Número">
-                  <input
-                    type="text"
-                    value={form.numero}
-                    onChange={(e) => setField('numero', e.target.value)}
-                    placeholder="123"
-                    className={inputClass()}
-                  />
-                </Field>
-
-                <Field label="Bairro">
-                  <input
-                    type="text"
-                    value={form.bairro}
-                    onChange={(e) => setField('bairro', e.target.value)}
-                    className={inputClass()}
-                  />
-                </Field>
-
-                <Field label="Estado (UF)">
-                  <select
-                    value={form.uf}
-                    onChange={(e) => setField('uf', e.target.value)}
-                    className={inputClass()}
-                  >
-                    <option value="">Selecione</option>
-                    {UF_LIST.map((uf) => (
-                      <option key={uf.sigla} value={uf.sigla}>
-                        {uf.nome}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="Município">
-                  <MunicipioSelect
-                    value={form.municipio}
-                    onChange={(value) => setField('municipio', value)}
-                    options={municipios}
-                    disabled={!form.uf}
-                    loading={municipiosLoading}
-                  />
-                </Field>
-
-                <div className="flex flex-col gap-2 border-t border-gray-100 pt-3">
-                  <p className="text-xs text-gray-400">
-                    * Bairro e Cidade são essenciais para o mapa de calor político.
-                  </p>
-                  <div className="flex items-center justify-between gap-2">
-                    {localizacaoOk ? (
-                      <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                        <CheckCircle size={14} />
-                        Localização OK
-                      </span>
-                    ) : (
-                      <span className="text-xs text-gray-400">Localização incompleta</span>
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleBuscarCoordenadas}
-                      disabled={coordLoading}
-                      className="flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-200 disabled:opacity-50"
-                    >
-                      {coordLoading ? (
-                        <Loader2 size={14} className="animate-spin" />
-                      ) : (
-                        <Search size={14} />
-                      )}
-                      Buscar Coordenadas
-                    </button>
-                  </div>
-                  {coordError && <p className="text-xs text-red-600">{coordError}</p>}
-                  {form.coordenadas && (
-                    <p className="text-xs text-emerald-600">
-                      {form.coordenadas.lat.toFixed(5)}, {form.coordenadas.lng.toFixed(5)}
-                    </p>
-                  )}
-                </div>
-              </Section>
-
-              <Section icon={Briefcase} title="Origem do contato" tone="purple">
-                <Field label="Origem">
-                  <select
-                    value={form.origem}
-                    onChange={(e) => setField('origem', e.target.value)}
-                    className={inputClass()}
-                  >
-                    <option value="">Selecione</option>
-                    {ORIGEM_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-              </Section>
+              <PedidoVotoFields
+                form={form}
+                errors={errors}
+                setField={setField}
+                municipios={municipios}
+                municipiosLoading={municipiosLoading}
+                cepLoading={cepLoading}
+                coordLoading={coordLoading}
+                coordError={coordError}
+                onCepBlur={handleCepBlur}
+                onBuscarCoordenadas={handleBuscarCoordenadas}
+              />
 
               {submitError && <p className="text-sm text-red-600">{submitError}</p>}
 
@@ -557,59 +179,5 @@ function ConfirmationCard({ form, onReset }) {
         Registrar próximo eleitor
       </button>
     </div>
-  )
-}
-
-function Field({ label, error, children }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-    </div>
-  )
-}
-
-function inputClass(error) {
-  return `w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000] ${
-    error ? 'border-red-400' : 'border-gray-300'
-  }`
-}
-
-function VoteButton({ active, onClick, icon: Icon, label, variant }) {
-  const activeClasses =
-    variant === 'green'
-      ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-      : 'border-red-400 bg-red-50 text-red-700'
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex flex-col items-center gap-1.5 rounded-xl border py-3 text-sm font-semibold transition ${
-        active ? activeClasses : 'border-gray-200 bg-gray-50 text-gray-500'
-      }`}
-    >
-      <Icon size={18} />
-      {label}
-    </button>
-  )
-}
-
-function GeneroPill({ active, onClick, label }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
-        active
-          ? 'bg-[#b8e000] text-gray-900'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-      }`}
-    >
-      {label}
-    </button>
   )
 }

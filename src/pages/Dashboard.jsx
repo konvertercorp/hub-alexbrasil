@@ -22,7 +22,7 @@ export function Dashboard() {
       <Header appName="HUB AlexBrasil" />
 
       <main className="px-5 py-8">
-        <div className="mx-auto grid max-w-md grid-cols-3 gap-x-4 gap-y-8">
+        <div className="mx-auto grid max-w-md grid-cols-4 justify-items-center gap-x-2 gap-y-6">
           {visibleModules.map((module) => (
             <AppTile key={module.to} {...module} />
           ))}

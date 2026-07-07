@@ -165,6 +165,9 @@ create policy "pedidos_select_team" on pedidos_voto
 create policy "pedidos_insert_own" on pedidos_voto
   for insert with check (created_by = auth.uid());
 
+create policy "pedidos_update_team" on pedidos_voto
+  for update using (created_by in (select id from get_descendant_ids(auth.uid())));
+
 -- ============================================================
 -- 8. Row Level Security — checkins
 -- ============================================================

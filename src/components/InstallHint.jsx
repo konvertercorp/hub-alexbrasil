@@ -21,7 +21,7 @@ export function InstallHint() {
       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lime-100">
         <Smartphone className="h-5 w-5 text-lime-700" />
       </div>
-      <p className="text-sm font-semibold text-gray-900">Adicione como app</p>
+      <p className="text-sm font-semibold text-gray-900">Instruções para adicionar à sua tela inicial</p>
       {ios ? (
         <p className="flex flex-wrap items-center justify-center gap-1 text-xs text-gray-500">
           No navegador, toque em <Share size={14} className="inline text-gray-500" /> e selecione

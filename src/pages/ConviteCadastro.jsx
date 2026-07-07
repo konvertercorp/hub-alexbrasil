@@ -121,7 +121,7 @@ export function ConviteCadastro() {
               <CheckCircle2 className="h-7 w-7 text-emerald-600" />
             </div>
             <h1 className="text-xl font-bold text-gray-900">Conta criada!</h1>
-            <p className="text-sm text-gray-500">Você já pode usar o app.</p>
+            <p className="text-sm text-gray-500">Tudo pronto! Você já pode continuar.</p>
           </div>
 
           <InstallHint />

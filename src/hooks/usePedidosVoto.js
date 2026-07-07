@@ -97,5 +97,19 @@ export function usePedidosVoto() {
     [profile],
   )
 
-  return { pedidos, stats: computeStats(pedidos), addPedido, loading }
+  const updatePedido = useCallback(async (id, form) => {
+    const { created_by, ...row } = toRow(form, null)
+    const { data, error } = await supabase
+      .from('pedidos_voto')
+      .update(row)
+      .eq('id', id)
+      .select()
+      .single()
+    if (error) throw error
+    const entry = fromRow(data)
+    setPedidos((prev) => prev.map((p) => (p.id === id ? entry : p)))
+    return entry
+  }, [])
+
+  return { pedidos, stats: computeStats(pedidos), addPedido, updatePedido, loading }
 }

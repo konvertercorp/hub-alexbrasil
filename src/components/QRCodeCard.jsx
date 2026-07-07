@@ -91,8 +91,8 @@ export function QRCodeCard({ appName = 'HUB AlexBrasil' }) {
           />
           <Step
             number={3}
-            title="Adicione como app"
-            description='No navegador, toque no menu (⋮) e selecione "Adicionar à tela inicial" ou "Instalar aplicativo" para usar como app.'
+            title="Adicione à tela inicial"
+            description='No navegador, toque no menu (⋮) e selecione "Adicionar à tela inicial".'
             highlight
           />
         </div>
