@@ -197,15 +197,44 @@ create policy "noticias_select_all" on noticias
   for select using (ativo = true);
 
 -- ============================================================
--- 10. Gamificação — ranking de pontos e estatísticas de medalhas
---     Pontuação: 2 pontos por pessoa convidada diretamente (seu
---     próprio link/convite) + 1 ponto por voto "sim" registrado.
+-- 10. Gamificação — ranking com 4 categorias e estatísticas de medalhas
+--
+--     Pontos: 2 por pessoa convidada diretamente + 1 por voto "sim"
+--     que você mesmo registrou + 0,5 por voto "sim" registrado por
+--     QUALQUER pessoa abaixo de você na hierarquia (direta ou
+--     indiretamente — o crédito sobe a cadeia toda, nunca desce).
+--
+--     Líderes: quantidade de pessoas que entraram com seu link direto.
+--     Votos diretos: votos "sim" que você mesmo registrou.
+--     Votos da equipe: soma de votos "sim" registrados por você e
+--     por toda a sua rede abaixo (direta e indireta).
 -- ============================================================
-create or replace function get_ranking()
+create or replace function get_ancestor_ids(node_id uuid)
+returns table (id uuid)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  with recursive up as (
+    select p.id, p.parent_id from profiles p where p.id = node_id
+    union all
+    select p.id, p.parent_id from profiles p
+    inner join up on p.id = up.parent_id
+  )
+  select id from up;
+$$;
+
+grant execute on function get_ancestor_ids(uuid) to authenticated;
+
+drop function if exists get_ranking();
+drop function if exists get_ranking(text);
+
+create or replace function get_ranking(metric text default 'pontos')
 returns table (
   profile_id uuid,
   nome text,
-  pontos integer,
+  valor numeric,
   is_same_team boolean
 )
 language sql
@@ -213,17 +242,43 @@ security definer
 set search_path = public
 stable
 as $$
-  with vote_points as (
-    select created_by as profile_id, count(*) as pontos
+  with own_votes as (
+    select created_by as profile_id, count(*) as votos
     from pedidos_voto
     where voto = 'sim' and created_by is not null
     group by created_by
   ),
-  invite_points as (
-    select parent_id as profile_id, count(*) * 2 as pontos
+  direct_invites as (
+    select parent_id as profile_id, count(*) as lideres
     from profiles
     where parent_id is not null
     group by parent_id
+  ),
+  team_votes as (
+    select p.id as profile_id, coalesce(sum(ov.votos), 0) as votos_equipe
+    from profiles p
+    cross join lateral (select id from get_descendant_ids(p.id)) d
+    left join own_votes ov on ov.profile_id = d.id
+    group by p.id
+  ),
+  cascade_bonus as (
+    select a.id as profile_id, count(*) * 0.5 as bonus
+    from pedidos_voto pv
+    cross join lateral (
+      select id from get_ancestor_ids(pv.created_by) where id != pv.created_by
+    ) a
+    where pv.voto = 'sim' and pv.created_by is not null
+    group by a.id
+  ),
+  pontos as (
+    select p.id as profile_id,
+      (coalesce(ov.votos, 0) * 1)
+      + (coalesce(di.lideres, 0) * 2)
+      + coalesce(cb.bonus, 0) as valor
+    from profiles p
+    left join own_votes ov on ov.profile_id = p.id
+    left join direct_invites di on di.profile_id = p.id
+    left join cascade_bonus cb on cb.profile_id = p.id
   ),
   my_team as (
     select id from get_descendant_ids(auth.uid())
@@ -231,13 +286,22 @@ as $$
   select
     p.id as profile_id,
     case when p.id in (select id from my_team) then p.nome else null end as nome,
-    (coalesce(vp.pontos, 0) + coalesce(ip.pontos, 0))::integer as pontos,
+    case metric
+      when 'lideres' then coalesce(di.lideres, 0)::numeric
+      when 'votos_diretos' then coalesce(ov.votos, 0)::numeric
+      when 'votos_equipe' then coalesce(tv.votos_equipe, 0)::numeric
+      else coalesce(pt.valor, 0)
+    end as valor,
     (p.id in (select id from my_team)) as is_same_team
   from profiles p
-  left join vote_points vp on vp.profile_id = p.id
-  left join invite_points ip on ip.profile_id = p.id
-  order by pontos desc, p.created_at asc;
+  left join own_votes ov on ov.profile_id = p.id
+  left join direct_invites di on di.profile_id = p.id
+  left join team_votes tv on tv.profile_id = p.id
+  left join pontos pt on pt.profile_id = p.id
+  order by valor desc, p.created_at asc;
 $$;
+
+grant execute on function get_ranking(text) to authenticated;
 
 drop function if exists get_my_stats();
 
@@ -256,5 +320,4 @@ as $$
     (select count(*) from profiles where parent_id = auth.uid())::integer as total_convidados;
 $$;
 
-grant execute on function get_ranking() to authenticated;
 grant execute on function get_my_stats() to authenticated;

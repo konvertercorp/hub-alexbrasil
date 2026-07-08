@@ -10,17 +10,59 @@ const MEDAL_STYLES = [
   'bg-orange-400 text-orange-950',
 ]
 
+const METRICS = [
+  {
+    key: 'pontos',
+    label: 'Pontos',
+    unit: 'pts',
+    decimals: 1,
+    caption: '2 pts por líder direto · 1 pt por voto próprio · 0,5 pt por voto da equipe',
+  },
+  {
+    key: 'lideres',
+    label: 'Líderes',
+    unit: 'líderes',
+    decimals: 0,
+    caption: 'Pessoas que entraram com seu link direto',
+  },
+  {
+    key: 'votos_diretos',
+    label: 'Votos diretos',
+    unit: 'votos',
+    decimals: 0,
+    caption: 'Votos "sim" que você mesmo registrou',
+  },
+  {
+    key: 'votos_equipe',
+    label: 'Votos da equipe',
+    unit: 'votos',
+    decimals: 0,
+    caption: 'Votos "sim" de você e de toda sua rede abaixo',
+  },
+]
+
+function formatValor(valor, decimals) {
+  return Number(valor).toLocaleString('pt-BR', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+}
+
 export function Ranking() {
   const { profile } = useAuth()
+  const [metric, setMetric] = useState('pontos')
   const [ranking, setRanking] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.rpc('get_ranking').then(({ data }) => {
+    setLoading(true)
+    supabase.rpc('get_ranking', { metric }).then(({ data }) => {
       setRanking(data ?? [])
       setLoading(false)
     })
-  }, [])
+  }, [metric])
+
+  const activeMetric = METRICS.find((m) => m.key === metric)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-[#f2f4e6]">
@@ -34,10 +76,25 @@ export function Ranking() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Ranking</h1>
-              <p className="text-xs text-gray-500">
-                2 pontos por pessoa convidada · 1 ponto por voto
-              </p>
+              <p className="text-xs text-gray-500">{activeMetric.caption}</p>
             </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {METRICS.map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => setMetric(m.key)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                  metric === m.key
+                    ? 'bg-[#b8e000] text-gray-900'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
           </div>
 
           {loading ? (
@@ -52,6 +109,8 @@ export function Ranking() {
                   position={index + 1}
                   entry={entry}
                   isMe={entry.profile_id === profile?.id}
+                  unit={activeMetric.unit}
+                  decimals={activeMetric.decimals}
                 />
               ))}
             </div>
@@ -62,7 +121,7 @@ export function Ranking() {
   )
 }
 
-function RankingRow({ position, entry, isMe }) {
+function RankingRow({ position, entry, isMe, unit, decimals }) {
   const medalStyle = MEDAL_STYLES[position - 1]
 
   return (
@@ -89,7 +148,9 @@ function RankingRow({ position, entry, isMe }) {
         </p>
       </div>
 
-      <span className="shrink-0 text-sm font-bold text-gray-900">{entry.pontos} pts</span>
+      <span className="shrink-0 text-sm font-bold text-gray-900">
+        {formatValor(entry.valor, decimals)} {unit}
+      </span>
     </div>
   )
 }
