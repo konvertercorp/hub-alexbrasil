@@ -9,7 +9,7 @@ export const ROLE_LABELS = {
 export const INVITEE_ROLE = 'lider'
 
 // Por enquanto, todas as contas veem os mesmos módulos.
-const VISIBLE_MODULES = ['localizacao', 'votos', 'equipe']
+const VISIBLE_MODULES = ['localizacao', 'votos', 'equipe', 'ranking', 'medalhas']
 
 export function canAccessModule(_role, moduleKey) {
   return VISIBLE_MODULES.includes(moduleKey)

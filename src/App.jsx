@@ -9,6 +9,8 @@ import { Login } from './pages/Login'
 import { Setup } from './pages/Setup'
 import { ConviteCadastro } from './pages/ConviteCadastro'
 import { Equipe } from './pages/Equipe'
+import { Ranking } from './pages/Ranking'
+import { Medalhas } from './pages/Medalhas'
 import { AuthProvider } from './context/AuthContext'
 import { RequireAuth } from './components/RequireAuth'
 import { useDeviceContext } from './hooks/useDeviceContext'
@@ -67,6 +69,22 @@ function App() {
             element={
               <RequireAuth>
                 <Localizacao />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/ranking"
+            element={
+              <RequireAuth>
+                <Ranking />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/medalhas"
+            element={
+              <RequireAuth>
+                <Medalhas />
               </RequireAuth>
             }
           />

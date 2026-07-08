@@ -7,6 +7,8 @@ const COLOR_CLASSES = {
   orange: 'bg-orange-500',
   teal: 'bg-teal-600',
   indigo: 'bg-indigo-600',
+  amber: 'bg-amber-500',
+  pink: 'bg-pink-600',
 }
 
 export function AppTile({ to, icon: Icon, label, color = 'blue' }) {
