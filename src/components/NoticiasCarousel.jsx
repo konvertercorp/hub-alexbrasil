@@ -25,9 +25,17 @@ export function NoticiasCarousel() {
 
   const content = (
     <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-100">
-        <Newspaper size={16} className="text-lime-700" />
-      </div>
+      {noticia.imagem_url ? (
+        <img
+          src={noticia.imagem_url}
+          alt=""
+          className="h-9 w-9 shrink-0 rounded-xl object-cover"
+        />
+      ) : (
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-100">
+          <Newspaper size={16} className="text-lime-700" />
+        </div>
+      )}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-gray-900">{noticia.titulo}</p>
         {noticia.texto && (
