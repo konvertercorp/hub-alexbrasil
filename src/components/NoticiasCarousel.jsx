@@ -20,53 +20,57 @@ export function NoticiasCarousel() {
 
   const noticia = noticias[index % noticias.length]
 
-  const goPrev = () => setIndex((prev) => (prev - 1 + noticias.length) % noticias.length)
-  const goNext = () => setIndex((prev) => (prev + 1) % noticias.length)
+  const goPrev = (e) => {
+    e.preventDefault()
+    setIndex((prev) => (prev - 1 + noticias.length) % noticias.length)
+  }
+  const goNext = (e) => {
+    e.preventDefault()
+    setIndex((prev) => (prev + 1) % noticias.length)
+  }
 
   const content = (
-    <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
+    <div className="relative h-36 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {noticia.imagem_url ? (
         <img
           src={noticia.imagem_url}
           alt=""
-          className="h-9 w-9 shrink-0 rounded-xl object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-100">
-          <Newspaper size={16} className="text-lime-700" />
+        <div className="absolute inset-0 flex items-center justify-center bg-lime-100">
+          <Newspaper size={28} className="text-lime-700" />
         </div>
       )}
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-gray-900">{noticia.titulo}</p>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+      <div className="absolute inset-x-0 bottom-0 p-3">
+        <p className="truncate text-sm font-semibold text-white">{noticia.titulo}</p>
         {noticia.texto && (
-          <p className="truncate text-xs text-gray-500">{noticia.texto}</p>
+          <p className="truncate text-xs text-white/80">{noticia.texto}</p>
         )}
       </div>
+
       {noticias.length > 1 && (
-        <div className="flex shrink-0 items-center gap-1">
+        <>
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              goPrev()
-            }}
+            onClick={goPrev}
             aria-label="Notícia anterior"
-            className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-700 backdrop-blur transition hover:bg-white"
           >
-            <ChevronLeft size={14} />
+            <ChevronLeft size={16} />
           </button>
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault()
-              goNext()
-            }}
+            onClick={goNext}
             aria-label="Próxima notícia"
-            className="flex h-6 w-6 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-700 backdrop-blur transition hover:bg-white"
           >
-            <ChevronRight size={14} />
+            <ChevronRight size={16} />
           </button>
-        </div>
+        </>
       )}
     </div>
   )
@@ -74,7 +78,7 @@ export function NoticiasCarousel() {
   return (
     <div className="mb-4">
       {noticia.link_url ? (
-        <a href={noticia.link_url} target="_blank" rel="noreferrer">
+        <a href={noticia.link_url} target="_blank" rel="noreferrer" className="block">
           {content}
         </a>
       ) : (

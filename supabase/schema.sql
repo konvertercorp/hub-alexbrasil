@@ -198,9 +198,8 @@ create policy "noticias_select_all" on noticias
 
 -- ============================================================
 -- 10. Gamificação — ranking de pontos e estatísticas de medalhas
---     Pontuação: 1 ponto por voto "sim" registrado, +10 de bônus
---     pra quem mais registrou no dia, +30 de bônus pra quem mais
---     registrou na semana (bônus é cumulativo por dia/semana vencida).
+--     Pontuação: 2 pontos por pessoa convidada diretamente (seu
+--     próprio link/convite) + 1 ponto por voto "sim" registrado.
 -- ============================================================
 create or replace function get_ranking()
 returns table (
@@ -214,41 +213,17 @@ security definer
 set search_path = public
 stable
 as $$
-  with base_points as (
+  with vote_points as (
     select created_by as profile_id, count(*) as pontos
     from pedidos_voto
     where voto = 'sim' and created_by is not null
     group by created_by
   ),
-  daily_counts as (
-    select created_by as profile_id, date_trunc('day', created_at) as dia, count(*) as votos
-    from pedidos_voto
-    where voto = 'sim' and created_by is not null
-    group by created_by, date_trunc('day', created_at)
-  ),
-  daily_max as (
-    select dia, max(votos) as max_votos from daily_counts group by dia
-  ),
-  daily_bonus as (
-    select dc.profile_id, count(*) * 10 as bonus
-    from daily_counts dc
-    join daily_max dm on dc.dia = dm.dia and dc.votos = dm.max_votos
-    group by dc.profile_id
-  ),
-  weekly_counts as (
-    select created_by as profile_id, date_trunc('week', created_at) as semana, count(*) as votos
-    from pedidos_voto
-    where voto = 'sim' and created_by is not null
-    group by created_by, date_trunc('week', created_at)
-  ),
-  weekly_max as (
-    select semana, max(votos) as max_votos from weekly_counts group by semana
-  ),
-  weekly_bonus as (
-    select wc.profile_id, count(*) * 30 as bonus
-    from weekly_counts wc
-    join weekly_max wm on wc.semana = wm.semana and wc.votos = wm.max_votos
-    group by wc.profile_id
+  invite_points as (
+    select parent_id as profile_id, count(*) * 2 as pontos
+    from profiles
+    where parent_id is not null
+    group by parent_id
   ),
   my_team as (
     select id from get_descendant_ids(auth.uid())
@@ -256,50 +231,29 @@ as $$
   select
     p.id as profile_id,
     case when p.id in (select id from my_team) then p.nome else null end as nome,
-    (coalesce(bp.pontos, 0) + coalesce(db.bonus, 0) + coalesce(wb.bonus, 0))::integer as pontos,
+    (coalesce(vp.pontos, 0) + coalesce(ip.pontos, 0))::integer as pontos,
     (p.id in (select id from my_team)) as is_same_team
   from profiles p
-  left join base_points bp on bp.profile_id = p.id
-  left join daily_bonus db on db.profile_id = p.id
-  left join weekly_bonus wb on wb.profile_id = p.id
+  left join vote_points vp on vp.profile_id = p.id
+  left join invite_points ip on ip.profile_id = p.id
   order by pontos desc, p.created_at asc;
 $$;
+
+drop function if exists get_my_stats();
 
 create or replace function get_my_stats()
 returns table (
   total_votos integer,
-  dias_recorde integer,
-  semanas_recorde integer
+  total_convidados integer
 )
 language sql
 security definer
 set search_path = public
 stable
 as $$
-  with daily_counts as (
-    select created_by, date_trunc('day', created_at) as dia, count(*) as votos
-    from pedidos_voto
-    where voto = 'sim' and created_by is not null
-    group by created_by, date_trunc('day', created_at)
-  ),
-  daily_max as (
-    select dia, max(votos) as max_votos from daily_counts group by dia
-  ),
-  weekly_counts as (
-    select created_by, date_trunc('week', created_at) as semana, count(*) as votos
-    from pedidos_voto
-    where voto = 'sim' and created_by is not null
-    group by created_by, date_trunc('week', created_at)
-  ),
-  weekly_max as (
-    select semana, max(votos) as max_votos from weekly_counts group by semana
-  )
   select
     (select count(*) from pedidos_voto where created_by = auth.uid() and voto = 'sim')::integer as total_votos,
-    (select count(*) from daily_counts dc join daily_max dm on dc.dia = dm.dia and dc.votos = dm.max_votos
-      where dc.created_by = auth.uid())::integer as dias_recorde,
-    (select count(*) from weekly_counts wc join weekly_max wm on wc.semana = wm.semana and wc.votos = wm.max_votos
-      where wc.created_by = auth.uid())::integer as semanas_recorde;
+    (select count(*) from profiles where parent_id = auth.uid())::integer as total_convidados;
 $$;
 
 grant execute on function get_ranking() to authenticated;

@@ -1,5 +1,16 @@
 import { useEffect, useState } from 'react'
-import { UserPlus, ThumbsUp, Award, Trophy, Sun, CalendarCheck, Loader2, Lock } from 'lucide-react'
+import {
+  UserPlus,
+  Users,
+  Crown,
+  ThumbsUp,
+  Award,
+  Trophy,
+  Flame,
+  Gem,
+  Loader2,
+  Lock,
+} from 'lucide-react'
 import { Header } from '../components/Header'
 import { supabase } from '../lib/supabaseClient'
 
@@ -12,39 +23,60 @@ const BADGES = [
     check: () => true,
   },
   {
-    key: 'primeiro-voto',
-    label: 'Primeiro voto',
-    description: 'Registrou seu primeiro pedido de voto.',
+    key: 'lider-1',
+    label: '1 Líder convidado',
+    description: 'Convidou 1 pessoa com seu link.',
+    icon: UserPlus,
+    check: (stats) => stats.total_convidados >= 1,
+  },
+  {
+    key: 'lider-25',
+    label: '25 Líderes convidados',
+    description: 'Convidou 25 pessoas com seu link.',
+    icon: Users,
+    check: (stats) => stats.total_convidados >= 25,
+  },
+  {
+    key: 'lider-100',
+    label: '100 Líderes convidados',
+    description: 'Convidou 100 pessoas com seu link.',
+    icon: Crown,
+    check: (stats) => stats.total_convidados >= 100,
+  },
+  {
+    key: 'voto-1',
+    label: '1 voto',
+    description: 'Registrou 1 voto "sim".',
     icon: ThumbsUp,
     check: (stats) => stats.total_votos >= 1,
   },
   {
-    key: '10-votos',
+    key: 'voto-10',
     label: '10 votos',
     description: 'Registrou 10 votos "sim".',
     icon: Award,
     check: (stats) => stats.total_votos >= 10,
   },
   {
-    key: '100-votos',
+    key: 'voto-100',
     label: '100 votos',
     description: 'Registrou 100 votos "sim".',
     icon: Trophy,
     check: (stats) => stats.total_votos >= 100,
   },
   {
-    key: 'recorde-dia',
-    label: 'Recorde do dia',
-    description: 'Foi quem mais registrou votos em um dia.',
-    icon: Sun,
-    check: (stats) => stats.dias_recorde >= 1,
+    key: 'voto-500',
+    label: '500 votos',
+    description: 'Registrou 500 votos "sim".',
+    icon: Flame,
+    check: (stats) => stats.total_votos >= 500,
   },
   {
-    key: 'recorde-semana',
-    label: 'Recorde da semana',
-    description: 'Foi quem mais registrou votos em uma semana.',
-    icon: CalendarCheck,
-    check: (stats) => stats.semanas_recorde >= 1,
+    key: 'voto-1000',
+    label: '1000 votos',
+    description: 'Registrou 1000 votos "sim".',
+    icon: Gem,
+    check: (stats) => stats.total_votos >= 1000,
   },
 ]
 
@@ -54,7 +86,7 @@ export function Medalhas() {
 
   useEffect(() => {
     supabase.rpc('get_my_stats').then(({ data }) => {
-      setStats(data?.[0] ?? { total_votos: 0, dias_recorde: 0, semanas_recorde: 0 })
+      setStats(data?.[0] ?? { total_votos: 0, total_convidados: 0 })
       setLoading(false)
     })
   }, [])

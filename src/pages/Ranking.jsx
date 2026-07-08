@@ -35,7 +35,7 @@ export function Ranking() {
             <div>
               <h1 className="text-xl font-bold text-gray-900">Ranking</h1>
               <p className="text-xs text-gray-500">
-                1 ponto por voto · +10 recorde do dia · +30 recorde da semana
+                2 pontos por pessoa convidada · 1 ponto por voto
               </p>
             </div>
           </div>

@@ -6,14 +6,14 @@ import { useAuth } from '../context/AuthContext'
 import { canAccessModule } from '../utils/roles'
 
 const MODULES = [
-  { key: 'localizacao', to: '/localizacao', label: 'Check-in', icon: MapPin, color: 'blue' },
-  { key: 'atividades', to: '/atividades', label: 'Atividades', icon: ListChecks, color: 'purple' },
-  { key: 'votos', to: '/votos', label: 'Pedido de Voto', icon: IdCard, color: 'green' },
-  { key: 'noticias', to: '/noticias', label: 'Notícias', icon: Newspaper, color: 'orange' },
-  { key: 'emendas', to: '/emendas', label: 'Emendas', icon: FileText, color: 'teal' },
   { key: 'ranking', to: '/ranking', label: 'Ranking', icon: Trophy, color: 'amber' },
   { key: 'medalhas', to: '/medalhas', label: 'Medalhas', icon: Medal, color: 'pink' },
+  { key: 'votos', to: '/votos', label: 'Pedido de Voto', icon: IdCard, color: 'green' },
   { key: 'equipe', to: '/equipe', label: 'Minha Equipe', icon: Users, color: 'indigo' },
+  { key: 'localizacao', to: '/localizacao', label: 'Check-in', icon: MapPin, color: 'blue' },
+  { key: 'atividades', to: '/atividades', label: 'Atividades', icon: ListChecks, color: 'purple' },
+  { key: 'noticias', to: '/noticias', label: 'Notícias', icon: Newspaper, color: 'orange' },
+  { key: 'emendas', to: '/emendas', label: 'Emendas', icon: FileText, color: 'teal' },
 ]
 
 export function Dashboard() {
