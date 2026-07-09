@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
-import { Map as MapIcon, Loader2 } from 'lucide-react'
+import { Map as MapIcon, Loader2, TrendingUp } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
 import { supabase } from '../../lib/supabaseClient'
 
@@ -32,8 +32,52 @@ function heatColor(count, max) {
   return `rgb(${rgb.join(',')})`
 }
 
+function startOfDay(date) {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+
+function buildDailyBuckets(dates, days = 30) {
+  const today = startOfDay(new Date())
+  const buckets = []
+  for (let i = days - 1; i >= 0; i--) {
+    const day = new Date(today)
+    day.setDate(day.getDate() - i)
+    buckets.push({ label: day.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }), count: 0 })
+  }
+  for (const d of dates) {
+    const diffDays = Math.round((today - startOfDay(d)) / 86400000)
+    if (diffDays >= 0 && diffDays < days) buckets[days - 1 - diffDays].count += 1
+  }
+  return buckets
+}
+
+function buildWeeklyBuckets(dates, weeks = 12) {
+  const today = startOfDay(new Date())
+  const ranges = []
+  for (let i = weeks - 1; i >= 0; i--) {
+    const end = new Date(today)
+    end.setDate(end.getDate() - i * 7)
+    const start = new Date(end)
+    start.setDate(start.getDate() - 6)
+    ranges.push({ start, end, count: 0 })
+  }
+  for (const d of dates) {
+    const day = startOfDay(d)
+    const bucket = ranges.find((r) => day >= r.start && day <= r.end)
+    if (bucket) bucket.count += 1
+  }
+  return ranges.map((r) => ({
+    label: r.start.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+    count: r.count,
+  }))
+}
+
 export function GestaoGraficos() {
   const [geoJson, setGeoJson] = useState(null)
+  const [createdDates, setCreatedDates] = useState([])
+  const [periodo, setPeriodo] = useState('dia')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -45,8 +89,12 @@ export function GestaoGraficos() {
         const [malha, municipios, pedidos] = await Promise.all([
           fetch(MALHA_URL).then((r) => r.json()),
           fetch(MUNICIPIOS_URL).then((r) => r.json()),
-          supabase.from('pedidos_voto').select('municipio, uf'),
+          supabase.from('pedidos_voto').select('municipio, uf, created_at'),
         ])
+
+        if (!cancelled) {
+          setCreatedDates((pedidos.data ?? []).map((p) => p.created_at))
+        }
 
         const codeToNome = new Map(municipios.map((m) => [String(m.id), m.nome]))
         const nomeCounts = new Map()
@@ -89,6 +137,17 @@ export function GestaoGraficos() {
       .sort((a, b) => b.properties.count - a.properties.count)
       .slice(0, 10)
   }, [geoJson])
+
+  const buckets = useMemo(() => {
+    return periodo === 'dia'
+      ? buildDailyBuckets(createdDates, 30)
+      : buildWeeklyBuckets(createdDates, 12)
+  }, [createdDates, periodo])
+
+  const maxBucketCount = useMemo(
+    () => buckets.reduce((max, b) => Math.max(max, b.count), 0),
+    [buckets],
+  )
 
   return (
     <div>
@@ -165,6 +224,72 @@ export function GestaoGraficos() {
               </div>
             )}
           </>
+        )}
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-lime-50 text-lime-700">
+              <TrendingUp size={18} />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-gray-900">Evolução de cadastros</h2>
+              <p className="text-xs text-gray-500">Pedidos de voto registrados ao longo do tempo</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPeriodo('dia')}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                periodo === 'dia'
+                  ? 'bg-[#b8e000] text-gray-900'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Últimos 30 dias
+            </button>
+            <button
+              type="button"
+              onClick={() => setPeriodo('semana')}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                periodo === 'semana'
+                  ? 'bg-[#b8e000] text-gray-900'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Últimas 12 semanas
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="mt-10 flex justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <div className="mt-6 flex h-40 items-end gap-1">
+            {buckets.map((b, i) => (
+              <div
+                key={i}
+                title={`${b.label}: ${b.count} pedido(s)`}
+                className="group relative flex h-full flex-1 flex-col items-center justify-end"
+              >
+                <div
+                  className="w-full rounded-t bg-[#b8e000] transition group-hover:bg-[#a3cc00]"
+                  style={{
+                    height: `${maxBucketCount ? Math.max((b.count / maxBucketCount) * 100, b.count > 0 ? 4 : 0) : 0}%`,
+                  }}
+                />
+                {(periodo === 'semana' || i % 5 === 0 || i === buckets.length - 1) && (
+                  <span className="mt-1 rotate-45 whitespace-nowrap text-[9px] text-gray-400">
+                    {b.label}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -388,3 +388,25 @@ create policy "noticias_admin_all" on noticias
 
 -- Promove uma conta existente para admin (rode manualmente, uma vez por pessoa):
 -- update profiles set role = 'admin' where telefone = '(48) 99963-9593';
+
+-- ============================================================
+-- 12. Log de atividade — auditoria de criações/edições feitas no app
+--     (visível só para admins na tela /gestao/atividade)
+-- ============================================================
+create table if not exists activity_log (
+  id uuid primary key default gen_random_uuid(),
+  actor_id uuid references profiles(id) on delete set null,
+  action text not null,
+  entity_type text not null,
+  entity_id uuid,
+  details jsonb,
+  created_at timestamptz not null default now()
+);
+
+alter table activity_log enable row level security;
+
+create policy "activity_insert_own" on activity_log
+  for insert with check (actor_id = auth.uid());
+
+create policy "activity_select_admin" on activity_log
+  for select using (is_admin());

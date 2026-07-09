@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import { logActivity } from '../utils/activityLog'
 
 function toRow(form, userId) {
   return {
@@ -92,24 +93,29 @@ export function usePedidosVoto() {
       if (error) throw error
       const entry = fromRow(data)
       setPedidos((prev) => [entry, ...prev])
+      logActivity(profile.id, 'pedido_criado', 'pedido_voto', entry.id, { nome: entry.nome })
       return entry
     },
     [profile],
   )
 
-  const updatePedido = useCallback(async (id, form) => {
-    const { created_by, ...row } = toRow(form, null)
-    const { data, error } = await supabase
-      .from('pedidos_voto')
-      .update(row)
-      .eq('id', id)
-      .select()
-      .single()
-    if (error) throw error
-    const entry = fromRow(data)
-    setPedidos((prev) => prev.map((p) => (p.id === id ? entry : p)))
-    return entry
-  }, [])
+  const updatePedido = useCallback(
+    async (id, form) => {
+      const { created_by, ...row } = toRow(form, null)
+      const { data, error } = await supabase
+        .from('pedidos_voto')
+        .update(row)
+        .eq('id', id)
+        .select()
+        .single()
+      if (error) throw error
+      const entry = fromRow(data)
+      setPedidos((prev) => prev.map((p) => (p.id === id ? entry : p)))
+      logActivity(profile.id, 'pedido_editado', 'pedido_voto', entry.id, { nome: entry.nome })
+      return entry
+    },
+    [profile],
+  )
 
   return { pedidos, stats: computeStats(pedidos), addPedido, updatePedido, loading }
 }

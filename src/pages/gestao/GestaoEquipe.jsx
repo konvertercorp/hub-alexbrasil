@@ -4,6 +4,7 @@ import { supabase, phoneToEmail, createEphemeralClient } from '../../lib/supabas
 import { useAuth } from '../../context/AuthContext'
 import { ROLE_LABELS, generateInviteCode } from '../../utils/roles'
 import { formatPhone, isValidPhone } from '../../utils/formatters'
+import { logActivity } from '../../utils/activityLog'
 
 const ROLE_OPTIONS = ['lider', 'deputado', 'admin']
 
@@ -97,6 +98,11 @@ export function GestaoEquipe() {
         })
       }
 
+      logActivity(profile.id, 'usuario_criado', 'profile', userId, {
+        nome: form.nome,
+        role: form.role,
+      })
+
       setShowForm(false)
       setForm(BLANK_FORM)
       fetchProfiles()
@@ -119,7 +125,14 @@ export function GestaoEquipe() {
       : `Remover admin de ${p.nome}? O papel volta para Líder.`
     if (!window.confirm(confirmMsg)) return
     const { error } = await supabase.from('profiles').update({ role: nextRole }).eq('id', p.id)
-    if (!error) fetchProfiles()
+    if (!error) {
+      logActivity(profile.id, 'papel_alterado', 'profile', p.id, {
+        nome: p.nome,
+        de: p.role,
+        para: nextRole,
+      })
+      fetchProfiles()
+    }
   }
 
   return (

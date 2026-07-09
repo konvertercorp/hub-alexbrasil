@@ -1,6 +1,17 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Newspaper, Users, UserCog, MapPin, BarChart3, LogOut, Menu, X } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Newspaper,
+  Users,
+  UserCog,
+  MapPin,
+  BarChart3,
+  History,
+  LogOut,
+  Menu,
+  X,
+} from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const NAV_ITEMS = [
@@ -10,6 +21,7 @@ const NAV_ITEMS = [
   { to: '/gestao/eleitores', label: 'Eleitores', icon: Users },
   { to: '/gestao/equipe', label: 'Equipe', icon: UserCog },
   { to: '/gestao/checkins', label: 'Check-ins', icon: MapPin },
+  { to: '/gestao/atividade', label: 'Atividade', icon: History },
 ]
 
 export function GestaoLayout() {

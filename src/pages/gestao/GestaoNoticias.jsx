@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, Loader2, Eye, EyeOff, X } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
+import { useAuth } from '../../context/AuthContext'
+import { logActivity } from '../../utils/activityLog'
 
 const BLANK_FORM = { titulo: '', texto: '', imagem_url: '', link_url: '', ativo: true }
 
 export function GestaoNoticias() {
+  const { profile } = useAuth()
   const [noticias, setNoticias] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -66,26 +69,38 @@ export function GestaoNoticias() {
       ativo: form.ativo,
     }
     const query = editingId
-      ? supabase.from('noticias').update(row).eq('id', editingId)
-      : supabase.from('noticias').insert(row)
-    const { error: saveError } = await query
+      ? supabase.from('noticias').update(row).eq('id', editingId).select().single()
+      : supabase.from('noticias').insert(row).select().single()
+    const { data, error: saveError } = await query
     setSaving(false)
     if (saveError) {
       setError('Não foi possível salvar. Tente novamente.')
       return
     }
+    logActivity(
+      profile.id,
+      editingId ? 'noticia_editada' : 'noticia_criada',
+      'noticia',
+      data.id,
+      { titulo: data.titulo },
+    )
     setShowForm(false)
     fetchAll()
   }
 
   const toggleAtivo = async (noticia) => {
     await supabase.from('noticias').update({ ativo: !noticia.ativo }).eq('id', noticia.id)
+    logActivity(profile.id, 'noticia_status_alterado', 'noticia', noticia.id, {
+      titulo: noticia.titulo,
+      ativo: !noticia.ativo,
+    })
     fetchAll()
   }
 
   const handleDelete = async (noticia) => {
     if (!window.confirm(`Excluir a notícia "${noticia.titulo}"?`)) return
     await supabase.from('noticias').delete().eq('id', noticia.id)
+    logActivity(profile.id, 'noticia_excluida', 'noticia', noticia.id, { titulo: noticia.titulo })
     fetchAll()
   }
 

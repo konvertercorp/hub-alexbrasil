@@ -16,17 +16,7 @@ import { TagInput } from './TagInput'
 import { MunicipioSelect } from './MunicipioSelect'
 import { UF_LIST } from '../utils/ufs'
 import { formatPhone, formatCPF, formatCEP, formatDateBR } from '../utils/formatters'
-
-const TIPO_CONTATO_OPTIONS = ['Eleitor', 'Liderança', 'Apoiador', 'Voluntário', 'Doador']
-const STATUS_OPTIONS = ['Registrado', 'Contatado', 'Confirmado', 'Indeciso', 'Inativo']
-const ORIGEM_OPTIONS = [
-  'Gabinete / Atendimento Presencial',
-  'Evento',
-  'Porta a Porta',
-  'Indicação',
-  'Redes Sociais',
-  'Outro',
-]
+import { TIPO_CONTATO_OPTIONS, STATUS_OPTIONS, ORIGEM_OPTIONS } from '../utils/pedidoVotoOptions'
 
 export function PedidoVotoFields({
   form,

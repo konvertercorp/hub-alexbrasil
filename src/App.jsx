@@ -18,6 +18,7 @@ import { GestaoNoticias } from './pages/gestao/GestaoNoticias'
 import { GestaoEleitores } from './pages/gestao/GestaoEleitores'
 import { GestaoEquipe } from './pages/gestao/GestaoEquipe'
 import { GestaoCheckins } from './pages/gestao/GestaoCheckins'
+import { GestaoAtividade } from './pages/gestao/GestaoAtividade'
 import { AuthProvider } from './context/AuthContext'
 import { RequireAuth } from './components/RequireAuth'
 import { RequireAdmin } from './components/RequireAdmin'
@@ -112,6 +113,7 @@ function App() {
             <Route path="eleitores" element={<GestaoEleitores />} />
             <Route path="equipe" element={<GestaoEquipe />} />
             <Route path="checkins" element={<GestaoCheckins />} />
+            <Route path="atividade" element={<GestaoAtividade />} />
           </Route>
           {MODULE_ROUTES.map(({ path, title }) => (
             <Route

@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Search, ThumbsUp, ThumbsDown, Pencil, Loader2, X } from 'lucide-react'
 import { PedidoVotoFields } from '../../components/PedidoVotoFields'
 import { usePedidosVoto } from '../../hooks/usePedidosVoto'
 import { useMunicipios } from '../../hooks/useMunicipios'
 import { useAddressLookup } from '../../hooks/useAddressLookup'
 import { validatePedidoVoto } from '../../utils/pedidoVotoValidation'
+import { supabase } from '../../lib/supabaseClient'
 
 const FILTERS = [
   { key: 'todos', label: 'Todos' },
@@ -49,6 +50,21 @@ export function GestaoEleitores() {
   const { pedidos, stats, loading, updatePedido } = usePedidosVoto()
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('todos')
+  const [filterMunicipio, setFilterMunicipio] = useState('')
+  const [filterTipo, setFilterTipo] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [filterCriador, setFilterCriador] = useState('')
+
+  const [profilesMap, setProfilesMap] = useState({})
+
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('id, nome')
+      .then(({ data }) => {
+        setProfilesMap(Object.fromEntries((data ?? []).map((p) => [p.id, p.nome])))
+      })
+  }, [])
 
   const [editingId, setEditingId] = useState(null)
   const [editForm, setEditForm] = useState(BLANK_FORM)
@@ -69,12 +85,35 @@ export function GestaoEleitores() {
     handleUseMyLocation,
   } = useAddressLookup(editForm, setEditField)
 
+  const municipioOptions = useMemo(
+    () => [...new Set(pedidos.map((p) => p.municipio).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [pedidos],
+  )
+  const tipoOptions = useMemo(
+    () => [...new Set(pedidos.map((p) => p.tipoContato).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [pedidos],
+  )
+  const statusOptions = useMemo(
+    () => [...new Set(pedidos.map((p) => p.status).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [pedidos],
+  )
+  const criadorOptions = useMemo(() => {
+    const ids = [...new Set(pedidos.map((p) => p.createdBy).filter(Boolean))]
+    return ids
+      .map((id) => ({ id, nome: profilesMap[id] ?? 'Desconhecido' }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+  }, [pedidos, profilesMap])
+
   const filtered = useMemo(() => {
     return pedidos
       .filter((p) => (filter === 'todos' ? true : p.voto === filter))
       .filter((p) => p.nome.toLowerCase().includes(search.trim().toLowerCase()))
+      .filter((p) => !filterMunicipio || p.municipio === filterMunicipio)
+      .filter((p) => !filterTipo || p.tipoContato === filterTipo)
+      .filter((p) => !filterStatus || p.status === filterStatus)
+      .filter((p) => !filterCriador || p.createdBy === filterCriador)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-  }, [pedidos, search, filter])
+  }, [pedidos, search, filter, filterMunicipio, filterTipo, filterStatus, filterCriador])
 
   const startEdit = (pedido) => {
     setEditingId(pedido.id)
@@ -141,6 +180,33 @@ export function GestaoEleitores() {
         </div>
       </div>
 
+      <div className="mt-3 flex flex-wrap gap-2">
+        <FilterSelect
+          value={filterMunicipio}
+          onChange={setFilterMunicipio}
+          placeholder="Município"
+          options={municipioOptions}
+        />
+        <FilterSelect
+          value={filterTipo}
+          onChange={setFilterTipo}
+          placeholder="Tipo de contato"
+          options={tipoOptions}
+        />
+        <FilterSelect
+          value={filterStatus}
+          onChange={setFilterStatus}
+          placeholder="Status"
+          options={statusOptions}
+        />
+        <FilterSelect
+          value={filterCriador}
+          onChange={setFilterCriador}
+          placeholder="Líder responsável"
+          options={criadorOptions.map((c) => ({ value: c.id, label: c.nome }))}
+        />
+      </div>
+
       <div className="mt-5 space-y-3">
         {loading ? (
           <p className="text-sm text-gray-400">Carregando...</p>
@@ -170,7 +236,12 @@ export function GestaoEleitores() {
                 saveError={saveError}
               />
             ) : (
-              <VoterRow key={pedido.id} pedido={pedido} onEdit={() => startEdit(pedido)} />
+              <VoterRow
+                key={pedido.id}
+                pedido={pedido}
+                criadorNome={profilesMap[pedido.createdBy]}
+                onEdit={() => startEdit(pedido)}
+              />
             ),
           )
         )}
@@ -184,7 +255,7 @@ const VOTO_BADGE = {
   nao: { className: 'bg-red-50 text-red-700', icon: ThumbsDown, label: 'NÃO' },
 }
 
-function VoterRow({ pedido, onEdit }) {
+function VoterRow({ pedido, criadorNome, onEdit }) {
   const badge = VOTO_BADGE[pedido.voto]
   return (
     <button
@@ -197,6 +268,8 @@ function VoterRow({ pedido, onEdit }) {
         <p className="mt-0.5 text-xs text-gray-500">
           {pedido.telefone}
           {pedido.tipoContato ? ` · ${pedido.tipoContato}` : ''}
+          {pedido.municipio ? ` · ${pedido.municipio}` : ''}
+          {criadorNome ? ` · por ${criadorNome}` : ''}
         </p>
       </div>
       <div className="flex items-center gap-2 sm:shrink-0">
@@ -291,5 +364,23 @@ function EditPedidoCard({
         </button>
       </div>
     </div>
+  )
+}
+
+function FilterSelect({ value, onChange, placeholder, options }) {
+  const normalized = options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o))
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 outline-none transition focus:ring-2 focus:ring-[#b8e000]"
+    >
+      <option value="">{placeholder}</option>
+      {normalized.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
   )
 }
