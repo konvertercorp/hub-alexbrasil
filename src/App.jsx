@@ -13,6 +13,7 @@ import { Ranking } from './pages/Ranking'
 import { Medalhas } from './pages/Medalhas'
 import { GestaoLayout } from './pages/gestao/GestaoLayout'
 import { GestaoDashboard } from './pages/gestao/GestaoDashboard'
+import { GestaoGraficos } from './pages/gestao/GestaoGraficos'
 import { GestaoNoticias } from './pages/gestao/GestaoNoticias'
 import { GestaoEleitores } from './pages/gestao/GestaoEleitores'
 import { GestaoEquipe } from './pages/gestao/GestaoEquipe'
@@ -106,6 +107,7 @@ function App() {
             }
           >
             <Route index element={<GestaoDashboard />} />
+            <Route path="graficos" element={<GestaoGraficos />} />
             <Route path="noticias" element={<GestaoNoticias />} />
             <Route path="eleitores" element={<GestaoEleitores />} />
             <Route path="equipe" element={<GestaoEquipe />} />

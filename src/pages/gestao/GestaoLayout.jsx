@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Newspaper, Users, UserCog, MapPin, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Newspaper, Users, UserCog, MapPin, BarChart3, LogOut, Menu, X } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const NAV_ITEMS = [
   { to: '/gestao', end: true, label: 'Visão geral', icon: LayoutDashboard },
+  { to: '/gestao/graficos', label: 'Gráficos', icon: BarChart3 },
   { to: '/gestao/noticias', label: 'Notícias', icon: Newspaper },
   { to: '/gestao/eleitores', label: 'Eleitores', icon: Users },
   { to: '/gestao/equipe', label: 'Equipe', icon: UserCog },
