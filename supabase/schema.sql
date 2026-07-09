@@ -261,29 +261,35 @@ as $$
     left join own_votes ov on ov.profile_id = d.id
     group by p.id
   ),
-  -- votos "sim" que não são autovoto (telefone do pedido != telefone do próprio autor),
-  -- usados só para pontuação: cadastro próprio da pessoa não vale ponto
-  own_votes_points as (
-    select pv.created_by as profile_id, count(*) as votos
+  -- votos "sim" atribuídos a quem de fato trouxe o eleitor: quando o pedido é o
+  -- autocadastro de alguém que entrou por convite (telefone do pedido = telefone
+  -- do próprio autor), o crédito vai para quem convidou (parent_id), não para
+  -- a própria pessoa que se cadastrou
+  effective_votes as (
+    select
+      case
+        when regexp_replace(coalesce(pv.telefone, ''), '\D', '', 'g')
+          = regexp_replace(coalesce(p.telefone, ''), '\D', '', 'g')
+        then p.parent_id
+        else pv.created_by
+      end as profile_id
     from pedidos_voto pv
     join profiles p on p.id = pv.created_by
-    where pv.voto = 'sim'
-      and pv.created_by is not null
-      and regexp_replace(coalesce(pv.telefone, ''), '\D', '', 'g')
-        <> regexp_replace(coalesce(p.telefone, ''), '\D', '', 'g')
-    group by pv.created_by
+    where pv.voto = 'sim' and pv.created_by is not null
+  ),
+  own_votes_points as (
+    select profile_id, count(*) as votos
+    from effective_votes
+    where profile_id is not null
+    group by profile_id
   ),
   cascade_bonus as (
     select a.id as profile_id, count(*) * 0.5 as bonus
-    from pedidos_voto pv
-    join profiles p on p.id = pv.created_by
+    from effective_votes ev
     cross join lateral (
-      select id from get_ancestor_ids(pv.created_by) where id != pv.created_by
+      select id from get_ancestor_ids(ev.profile_id) where id != ev.profile_id
     ) a
-    where pv.voto = 'sim'
-      and pv.created_by is not null
-      and regexp_replace(coalesce(pv.telefone, ''), '\D', '', 'g')
-        <> regexp_replace(coalesce(p.telefone, ''), '\D', '', 'g')
+    where ev.profile_id is not null
     group by a.id
   ),
   pontos as (
