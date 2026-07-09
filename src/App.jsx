@@ -11,8 +11,15 @@ import { ConviteCadastro } from './pages/ConviteCadastro'
 import { Equipe } from './pages/Equipe'
 import { Ranking } from './pages/Ranking'
 import { Medalhas } from './pages/Medalhas'
+import { GestaoLayout } from './pages/gestao/GestaoLayout'
+import { GestaoDashboard } from './pages/gestao/GestaoDashboard'
+import { GestaoNoticias } from './pages/gestao/GestaoNoticias'
+import { GestaoEleitores } from './pages/gestao/GestaoEleitores'
+import { GestaoEquipe } from './pages/gestao/GestaoEquipe'
+import { GestaoCheckins } from './pages/gestao/GestaoCheckins'
 import { AuthProvider } from './context/AuthContext'
 import { RequireAuth } from './components/RequireAuth'
+import { RequireAdmin } from './components/RequireAdmin'
 import { useDeviceContext } from './hooks/useDeviceContext'
 
 const MODULE_ROUTES = [
@@ -88,6 +95,22 @@ function App() {
               </RequireAuth>
             }
           />
+          <Route
+            path="/gestao"
+            element={
+              <RequireAuth>
+                <RequireAdmin>
+                  <GestaoLayout />
+                </RequireAdmin>
+              </RequireAuth>
+            }
+          >
+            <Route index element={<GestaoDashboard />} />
+            <Route path="noticias" element={<GestaoNoticias />} />
+            <Route path="eleitores" element={<GestaoEleitores />} />
+            <Route path="equipe" element={<GestaoEquipe />} />
+            <Route path="checkins" element={<GestaoCheckins />} />
+          </Route>
           {MODULE_ROUTES.map(({ path, title }) => (
             <Route
               key={path}

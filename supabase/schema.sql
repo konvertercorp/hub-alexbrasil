@@ -341,3 +341,41 @@ as $$
 $$;
 
 grant execute on function get_my_stats() to authenticated;
+
+-- ============================================================
+-- 11. Gestão (painel administrativo do gabinete, /gestao) — role
+--     "admin" com acesso total aos dados e CRUD de notícias.
+-- ============================================================
+alter table profiles drop constraint if exists profiles_role_check;
+alter table profiles add constraint profiles_role_check
+  check (role in ('deputado', 'lider', 'apoiador', 'admin'));
+
+create or replace function is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce((select role = 'admin' from profiles where id = auth.uid()), false);
+$$;
+
+grant execute on function is_admin() to authenticated;
+
+create policy "profiles_select_admin" on profiles
+  for select using (is_admin());
+
+create policy "pedidos_select_admin" on pedidos_voto
+  for select using (is_admin());
+
+create policy "pedidos_update_admin" on pedidos_voto
+  for update using (is_admin());
+
+create policy "checkins_select_admin" on checkins
+  for select using (is_admin());
+
+create policy "noticias_admin_all" on noticias
+  for all using (is_admin()) with check (is_admin());
+
+-- Promove uma conta existente para admin (rode manualmente, uma vez por pessoa):
+-- update profiles set role = 'admin' where telefone = '(48) 99963-9593';
