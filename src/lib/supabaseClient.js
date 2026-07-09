@@ -11,6 +11,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+// Client descartável, sem sessão persistida — usado para criar contas de
+// outras pessoas (painel de gestão) sem substituir a sessão do admin logado.
+export function createEphemeralClient() {
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+}
+
 // O login é feito pelo telefone em vez de e-mail, então sintetizamos um
 // e-mail interno para o Supabase Auth (que exige e-mail ou telefone).
 export function phoneToEmail(telefone) {

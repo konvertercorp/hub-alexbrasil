@@ -365,8 +365,17 @@ grant execute on function is_admin() to authenticated;
 create policy "profiles_select_admin" on profiles
   for select using (is_admin());
 
+create policy "profiles_insert_admin" on profiles
+  for insert with check (is_admin());
+
+create policy "profiles_update_admin" on profiles
+  for update using (is_admin());
+
 create policy "pedidos_select_admin" on pedidos_voto
   for select using (is_admin());
+
+create policy "pedidos_insert_admin" on pedidos_voto
+  for insert with check (is_admin());
 
 create policy "pedidos_update_admin" on pedidos_voto
   for update using (is_admin());
