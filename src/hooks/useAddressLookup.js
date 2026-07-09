@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { fetchAddressByCep } from '../utils/viacep'
-import { forwardGeocode } from '../utils/geocoding'
+import { forwardGeocode, reverseGeocodeStructured } from '../utils/geocoding'
 
 export function useAddressLookup(form, setField) {
   const [cepLoading, setCepLoading] = useState(false)
   const [coordLoading, setCoordLoading] = useState(false)
   const [coordError, setCoordError] = useState('')
+  const [locationLoading, setLocationLoading] = useState(false)
+  const [locationError, setLocationError] = useState('')
 
   const handleCepBlur = async () => {
     if (form.cep.replace(/\D/g, '').length !== 8) return
@@ -49,5 +51,50 @@ export function useAddressLookup(form, setField) {
     }
   }
 
-  return { cepLoading, coordLoading, coordError, handleCepBlur, handleBuscarCoordenadas }
+  const handleUseMyLocation = () => {
+    if (!('geolocation' in navigator)) {
+      setLocationError('Geolocalização não é suportada neste dispositivo.')
+      return
+    }
+    setLocationLoading(true)
+    setLocationError('')
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude: lat, longitude: lng } = position.coords
+        try {
+          const address = await reverseGeocodeStructured(lat, lng)
+          if (address.logradouro && !form.logradouro) setField('logradouro', address.logradouro)
+          if (address.bairro && !form.bairro) setField('bairro', address.bairro)
+          if (address.municipio && !form.municipio) setField('municipio', address.municipio)
+          if (address.uf && !form.uf) setField('uf', address.uf)
+          if (address.cep && !form.cep) setField('cep', address.cep)
+          setField('coordenadas', { lat, lng })
+        } catch {
+          setLocationError('Não foi possível identificar o endereço da sua localização.')
+        } finally {
+          setLocationLoading(false)
+        }
+      },
+      (error) => {
+        setLocationError(
+          error.code === error.PERMISSION_DENIED
+            ? 'Permissão de localização negada.'
+            : 'Não foi possível obter sua localização.',
+        )
+        setLocationLoading(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
+    )
+  }
+
+  return {
+    cepLoading,
+    coordLoading,
+    coordError,
+    locationLoading,
+    locationError,
+    handleCepBlur,
+    handleBuscarCoordenadas,
+    handleUseMyLocation,
+  }
 }

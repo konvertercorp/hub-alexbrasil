@@ -59,8 +59,16 @@ export function VotoList() {
 
   const { municipios, loading: municipiosLoading } = useMunicipios(editForm.uf)
   const setEditField = (field, value) => setEditForm((prev) => ({ ...prev, [field]: value }))
-  const { cepLoading, coordLoading, coordError, handleCepBlur, handleBuscarCoordenadas } =
-    useAddressLookup(editForm, setEditField)
+  const {
+    cepLoading,
+    coordLoading,
+    coordError,
+    locationLoading,
+    locationError,
+    handleCepBlur,
+    handleBuscarCoordenadas,
+    handleUseMyLocation,
+  } = useAddressLookup(editForm, setEditField)
 
   const filtered = useMemo(() => {
     return pedidos
@@ -157,8 +165,11 @@ export function VotoList() {
                     cepLoading={cepLoading}
                     coordLoading={coordLoading}
                     coordError={coordError}
+                    locationLoading={locationLoading}
+                    locationError={locationError}
                     onCepBlur={handleCepBlur}
                     onBuscarCoordenadas={handleBuscarCoordenadas}
+                    onUseMyLocation={handleUseMyLocation}
                     onCancel={cancelEdit}
                     onSave={handleSaveEdit}
                     saving={saving}
@@ -228,8 +239,11 @@ function EditPedidoCard({
   cepLoading,
   coordLoading,
   coordError,
+  locationLoading,
+  locationError,
   onCepBlur,
   onBuscarCoordenadas,
+  onUseMyLocation,
   onCancel,
   onSave,
   saving,
@@ -259,8 +273,11 @@ function EditPedidoCard({
           cepLoading={cepLoading}
           coordLoading={coordLoading}
           coordError={coordError}
+          locationLoading={locationLoading}
+          locationError={locationError}
           onCepBlur={onCepBlur}
           onBuscarCoordenadas={onBuscarCoordenadas}
+          onUseMyLocation={onUseMyLocation}
         />
       </div>
 

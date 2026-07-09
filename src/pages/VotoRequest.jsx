@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle2, ThumbsUp, ThumbsDown, Users } from 'lucide-react'
 import { Header } from '../components/Header'
@@ -44,8 +44,23 @@ export function VotoRequest() {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  const { cepLoading, coordLoading, coordError, handleCepBlur, handleBuscarCoordenadas } =
-    useAddressLookup(form, setField)
+  const {
+    cepLoading,
+    coordLoading,
+    coordError,
+    locationLoading,
+    locationError,
+    handleCepBlur,
+    handleBuscarCoordenadas,
+    handleUseMyLocation,
+  } = useAddressLookup(form, setField)
+
+  // Preenche o endereço automaticamente com a localização atual assim que o
+  // formulário abre (se a pessoa permitir o acesso à localização).
+  useEffect(() => {
+    handleUseMyLocation()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -106,8 +121,11 @@ export function VotoRequest() {
                 cepLoading={cepLoading}
                 coordLoading={coordLoading}
                 coordError={coordError}
+                locationLoading={locationLoading}
+                locationError={locationError}
                 onCepBlur={handleCepBlur}
                 onBuscarCoordenadas={handleBuscarCoordenadas}
+                onUseMyLocation={handleUseMyLocation}
               />
 
               {submitError && <p className="text-sm text-red-600">{submitError}</p>}
