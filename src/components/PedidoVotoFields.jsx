@@ -59,7 +59,7 @@ export function PedidoVotoFields({
           />
         </Field>
 
-        <Field label="Nome da mãe *" error={errors.nomeMae}>
+        <Field label="Nome da mãe" error={errors.nomeMae}>
           <input
             type="text"
             autoComplete="off"
