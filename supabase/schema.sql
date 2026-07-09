@@ -261,21 +261,37 @@ as $$
     left join own_votes ov on ov.profile_id = d.id
     group by p.id
   ),
+  -- votos "sim" que não são autovoto (telefone do pedido != telefone do próprio autor),
+  -- usados só para pontuação: cadastro próprio da pessoa não vale ponto
+  own_votes_points as (
+    select pv.created_by as profile_id, count(*) as votos
+    from pedidos_voto pv
+    join profiles p on p.id = pv.created_by
+    where pv.voto = 'sim'
+      and pv.created_by is not null
+      and regexp_replace(coalesce(pv.telefone, ''), '\D', '', 'g')
+        <> regexp_replace(coalesce(p.telefone, ''), '\D', '', 'g')
+    group by pv.created_by
+  ),
   cascade_bonus as (
     select a.id as profile_id, count(*) * 0.5 as bonus
     from pedidos_voto pv
+    join profiles p on p.id = pv.created_by
     cross join lateral (
       select id from get_ancestor_ids(pv.created_by) where id != pv.created_by
     ) a
-    where pv.voto = 'sim' and pv.created_by is not null
+    where pv.voto = 'sim'
+      and pv.created_by is not null
+      and regexp_replace(coalesce(pv.telefone, ''), '\D', '', 'g')
+        <> regexp_replace(coalesce(p.telefone, ''), '\D', '', 'g')
     group by a.id
   ),
   pontos as (
     select p.id as profile_id,
-      (coalesce(ov.votos, 0) * 1)
+      (coalesce(ovp.votos, 0) * 1)
       + coalesce(cb.bonus, 0) as valor
     from profiles p
-    left join own_votes ov on ov.profile_id = p.id
+    left join own_votes_points ovp on ovp.profile_id = p.id
     left join cascade_bonus cb on cb.profile_id = p.id
   ),
   my_team as (

@@ -16,7 +16,7 @@ const METRICS = [
     label: 'Pontos',
     unit: 'pts',
     decimals: 1,
-    caption: '1 pt por voto próprio · 0,5 pt por voto de qualquer pessoa da sua equipe',
+    caption: '1 pt por voto que você registrar de outra pessoa · 0,5 pt por voto de qualquer pessoa da sua equipe (seu próprio cadastro não vale ponto)',
   },
   {
     key: 'lideres',
