@@ -254,8 +254,8 @@ as $$
     where parent_id is not null
     group by parent_id
   ),
-  team_votes as (
-    select p.id as profile_id, coalesce(sum(ov.votos), 0) as votos_equipe
+  team_stats as (
+    select p.id as profile_id, count(d.id) as team_size, coalesce(sum(ov.votos), 0) as votos_equipe
     from profiles p
     cross join lateral (select id from get_descendant_ids(p.id)) d
     left join own_votes ov on ov.profile_id = d.id
@@ -274,10 +274,12 @@ as $$
     select p.id as profile_id,
       (coalesce(ov.votos, 0) * 1)
       + (coalesce(di.lideres, 0) * 2)
+      + (greatest(coalesce(ts.team_size, 1) - 1 - coalesce(di.lideres, 0), 0) * 0.5)
       + coalesce(cb.bonus, 0) as valor
     from profiles p
     left join own_votes ov on ov.profile_id = p.id
     left join direct_invites di on di.profile_id = p.id
+    left join team_stats ts on ts.profile_id = p.id
     left join cascade_bonus cb on cb.profile_id = p.id
   ),
   my_team as (
@@ -289,14 +291,14 @@ as $$
     case metric
       when 'lideres' then coalesce(di.lideres, 0)::numeric
       when 'votos_diretos' then coalesce(ov.votos, 0)::numeric
-      when 'votos_equipe' then coalesce(tv.votos_equipe, 0)::numeric
+      when 'votos_equipe' then coalesce(ts.votos_equipe, 0)::numeric
       else coalesce(pt.valor, 0)
     end as valor,
     (p.id in (select id from my_team)) as is_same_team
   from profiles p
   left join own_votes ov on ov.profile_id = p.id
   left join direct_invites di on di.profile_id = p.id
-  left join team_votes tv on tv.profile_id = p.id
+  left join team_stats ts on ts.profile_id = p.id
   left join pontos pt on pt.profile_id = p.id
   order by valor desc, p.created_at asc;
 $$;

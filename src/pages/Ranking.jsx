@@ -16,7 +16,7 @@ const METRICS = [
     label: 'Pontos',
     unit: 'pts',
     decimals: 1,
-    caption: '2 pts por líder direto · 1 pt por voto próprio · 0,5 pt por voto da equipe',
+    caption: '2 pts/líder direto · 0,5 pt/líder indireto · 1 pt/voto próprio · 0,5 pt/voto da equipe',
   },
   {
     key: 'lideres',
