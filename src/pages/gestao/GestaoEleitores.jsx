@@ -16,6 +16,7 @@ const FILTERS = [
 const BLANK_FORM = {
   nome: '',
   apelido: '',
+  nomeMae: '',
   telefone: '',
   cpf: '',
   dataNascimento: '',

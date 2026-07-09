@@ -6,6 +6,9 @@ export function validatePedidoVoto(form) {
   if (form.nome.trim().length < 3) {
     errors.nome = 'Informe o nome completo'
   }
+  if (!form.nomeMae || form.nomeMae.trim().length < 3) {
+    errors.nomeMae = 'Informe o nome da mãe'
+  }
   if (!isValidPhone(form.telefone)) {
     errors.telefone = 'Telefone inválido'
   }

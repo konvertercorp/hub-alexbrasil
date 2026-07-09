@@ -11,6 +11,7 @@ import { validatePedidoVoto } from '../utils/pedidoVotoValidation'
 const initialForm = {
   nome: '',
   apelido: '',
+  nomeMae: '',
   telefone: '',
   cpf: '',
   dataNascimento: '',

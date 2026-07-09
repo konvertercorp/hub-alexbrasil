@@ -59,6 +59,17 @@ export function PedidoVotoFields({
           />
         </Field>
 
+        <Field label="Nome da mãe *" error={errors.nomeMae}>
+          <input
+            type="text"
+            autoComplete="off"
+            value={form.nomeMae}
+            onChange={(e) => setField('nomeMae', e.target.value)}
+            placeholder="Ex: Maria da Silva Santos"
+            className={inputClass(errors.nomeMae)}
+          />
+        </Field>
+
         <Field label="WhatsApp / Telefone *" error={errors.telefone}>
           <input
             type="tel"

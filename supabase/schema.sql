@@ -24,6 +24,7 @@ create table if not exists pedidos_voto (
   created_by uuid not null references profiles(id) on delete cascade,
   nome text not null,
   apelido text,
+  nome_mae text,
   telefone text,
   cpf text,
   data_nascimento text,
@@ -46,6 +47,9 @@ create table if not exists pedidos_voto (
   origem text,
   created_at timestamptz not null default now()
 );
+
+-- Coluna adicionada depois — roda sem erro em bancos que já tinham a tabela:
+alter table pedidos_voto add column if not exists nome_mae text;
 
 alter table pedidos_voto enable row level security;
 
