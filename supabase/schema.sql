@@ -273,13 +273,9 @@ as $$
   pontos as (
     select p.id as profile_id,
       (coalesce(ov.votos, 0) * 1)
-      + (coalesce(di.lideres, 0) * 2)
-      + (greatest(coalesce(ts.team_size, 1) - 1 - coalesce(di.lideres, 0), 0) * 0.5)
       + coalesce(cb.bonus, 0) as valor
     from profiles p
     left join own_votes ov on ov.profile_id = p.id
-    left join direct_invites di on di.profile_id = p.id
-    left join team_stats ts on ts.profile_id = p.id
     left join cascade_bonus cb on cb.profile_id = p.id
   ),
   my_team as (
