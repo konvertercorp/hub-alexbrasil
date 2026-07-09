@@ -179,7 +179,7 @@ function VoterRow({ pedido, onEdit }) {
     <button
       type="button"
       onClick={onEdit}
-      className="flex w-full items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-[#b8e000]"
+      className="flex w-full flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-[#b8e000] sm:flex-row sm:items-center sm:gap-4"
     >
       <div className="min-w-0 flex-1">
         <p className="truncate font-semibold text-gray-900">{pedido.nome}</p>
@@ -188,20 +188,22 @@ function VoterRow({ pedido, onEdit }) {
           {pedido.tipoContato ? ` · ${pedido.tipoContato}` : ''}
         </p>
       </div>
-      <span className="shrink-0 text-xs text-gray-400">{formatDate(pedido.createdAt)}</span>
-      {badge ? (
-        <span
-          className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${badge.className}`}
-        >
-          <badge.icon size={12} />
-          {badge.label}
-        </span>
-      ) : (
-        <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
-          Não informado
-        </span>
-      )}
-      <Pencil size={14} className="shrink-0 text-gray-300" />
+      <div className="flex items-center gap-2 sm:shrink-0">
+        <span className="text-xs text-gray-400">{formatDate(pedido.createdAt)}</span>
+        {badge ? (
+          <span
+            className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${badge.className}`}
+          >
+            <badge.icon size={12} />
+            {badge.label}
+          </span>
+        ) : (
+          <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
+            Não informado
+          </span>
+        )}
+        <Pencil size={14} className="shrink-0 text-gray-300" />
+      </div>
     </button>
   )
 }

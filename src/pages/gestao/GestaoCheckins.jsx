@@ -66,28 +66,32 @@ export function GestaoCheckins() {
           filtered.map((c) => (
             <div
               key={c.id}
-              className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+              className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center"
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
-                <MapPin size={16} />
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                  <MapPin size={16} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-gray-900">{c.nome}</p>
+                  <p className="truncate text-xs text-gray-500">
+                    {c.endereco ?? 'Endereço não disponível'}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold text-gray-900">{c.nome}</p>
-                <p className="truncate text-xs text-gray-500">
-                  {c.endereco ?? 'Endereço não disponível'}
-                </p>
+              <div className="flex flex-wrap items-center gap-2 pl-12 text-xs text-gray-500 sm:shrink-0 sm:pl-0">
+                <span>{c.autor?.nome ?? '—'}</span>
+                <span className="text-gray-400">{formatDate(c.created_at)}</span>
+                <a
+                  href={`https://www.google.com/maps?q=${c.lat},${c.lng}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 rounded-lg px-2 py-1 font-medium text-gray-400 transition hover:bg-gray-100 hover:text-gray-900"
+                >
+                  Mapa
+                  <ExternalLink size={12} />
+                </a>
               </div>
-              <span className="shrink-0 text-xs text-gray-500">{c.autor?.nome ?? '—'}</span>
-              <span className="shrink-0 text-xs text-gray-400">{formatDate(c.created_at)}</span>
-              <a
-                href={`https://www.google.com/maps?q=${c.lat},${c.lng}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-gray-400 transition hover:bg-gray-100 hover:text-gray-900"
-              >
-                Mapa
-                <ExternalLink size={12} />
-              </a>
             </div>
           ))
         )}

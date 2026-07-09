@@ -47,8 +47,36 @@ export function GestaoEquipe() {
         />
       </div>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <table className="w-full text-left text-sm">
+      {/* Mobile: lista de cards */}
+      <div className="mt-5 space-y-2 sm:hidden">
+        {loading ? (
+          <p className="text-sm text-gray-400">Carregando...</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-gray-400">Nenhuma pessoa encontrada.</p>
+        ) : (
+          filtered.map((p) => (
+            <div
+              key={p.id}
+              className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold text-gray-900">{p.nome}</p>
+                <p className="mt-0.5 truncate text-xs text-gray-500">
+                  {p.telefone} · convidado por {p.parent?.nome ?? '—'}
+                </p>
+                <p className="mt-0.5 text-xs text-gray-400">entrou em {formatDate(p.created_at)}</p>
+              </div>
+              <span className="shrink-0 rounded-full bg-lime-100 px-2.5 py-1 text-xs font-medium text-lime-800">
+                {ROLE_LABELS[p.role] ?? p.role}
+              </span>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop/tablet: tabela */}
+      <div className="mt-5 hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm sm:block">
+        <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
             <tr>
               <th className="px-4 py-3 font-medium">Nome</th>

@@ -91,7 +91,7 @@ export function GestaoNoticias() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Notícias</h1>
           <p className="mt-1 text-sm text-gray-500">Gerencie o carrossel exibido no Dashboard.</p>
@@ -196,55 +196,59 @@ export function GestaoNoticias() {
           noticias.map((noticia) => (
             <div
               key={noticia.id}
-              className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+              className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-4"
             >
-              {noticia.imagem_url ? (
-                <img
-                  src={noticia.imagem_url}
-                  alt=""
-                  className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                />
-              ) : (
-                <div className="h-14 w-14 shrink-0 rounded-xl bg-gray-100" />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-gray-900">{noticia.titulo}</p>
-                {noticia.texto && (
-                  <p className="truncate text-xs text-gray-500">{noticia.texto}</p>
+              <div className="flex items-center gap-3">
+                {noticia.imagem_url ? (
+                  <img
+                    src={noticia.imagem_url}
+                    alt=""
+                    className="h-12 w-12 shrink-0 rounded-xl object-cover sm:h-14 sm:w-14"
+                  />
+                ) : (
+                  <div className="h-12 w-12 shrink-0 rounded-xl bg-gray-100 sm:h-14 sm:w-14" />
                 )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-gray-900">{noticia.titulo}</p>
+                  {noticia.texto && (
+                    <p className="truncate text-xs text-gray-500">{noticia.texto}</p>
+                  )}
+                </div>
               </div>
-              <span
-                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                  noticia.ativo ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'
-                }`}
-              >
-                {noticia.ativo ? 'Ativa' : 'Inativa'}
-              </span>
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => toggleAtivo(noticia)}
-                  aria-label={noticia.ativo ? 'Desativar' : 'Ativar'}
-                  className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-900"
+              <div className="flex items-center gap-2 sm:shrink-0">
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                    noticia.ativo ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                  }`}
                 >
-                  {noticia.ativo ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => startEdit(noticia)}
-                  aria-label="Editar"
-                  className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-900"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(noticia)}
-                  aria-label="Excluir"
-                  className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
-                >
-                  <Trash2 size={16} />
-                </button>
+                  {noticia.ativo ? 'Ativa' : 'Inativa'}
+                </span>
+                <div className="ml-auto flex shrink-0 items-center gap-2 sm:ml-0">
+                  <button
+                    type="button"
+                    onClick={() => toggleAtivo(noticia)}
+                    aria-label={noticia.ativo ? 'Desativar' : 'Ativar'}
+                    className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    {noticia.ativo ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startEdit(noticia)}
+                    aria-label="Editar"
+                    className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(noticia)}
+                    aria-label="Excluir"
+                    className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             </div>
           ))
