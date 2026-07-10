@@ -44,7 +44,7 @@ export function EsqueciSenha() {
   const handleResetPassword = async (event) => {
     event.preventDefault()
     if (code.trim().length < 6) {
-      setError('Digite o código de 6 dígitos que enviamos por e-mail')
+      setError('Digite o código que enviamos por e-mail')
       return
     }
     if (password.length < 6) {
@@ -97,7 +97,7 @@ export function EsqueciSenha() {
           </h1>
           <p className="text-center text-sm text-gray-500">
             {step === 'email'
-              ? 'Digite o e-mail cadastrado na sua conta. Mandamos um código de 6 dígitos para redefinir a senha.'
+              ? 'Digite o e-mail cadastrado na sua conta. Mandamos um código para redefinir a senha.'
               : 'Enviamos um código para esse e-mail. Digite-o abaixo com sua nova senha.'}
           </p>
         </div>
@@ -160,7 +160,7 @@ export function EsqueciSenha() {
                   setCode(e.target.value)
                   setError('')
                 }}
-                placeholder="123456"
+                placeholder="Digite o código"
                 className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-center text-lg tracking-[0.3em] text-gray-900 placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-[#b8e000]"
               />
             </div>

@@ -1,5 +1,5 @@
 // Edge Function: recebe um e-mail, localiza a conta correspondente e
-// envia um código de 6 dígitos por e-mail via Resend (em vez de um link —
+// envia um código por e-mail via Resend (em vez de um link —
 // links de recuperação costumam ser "clicados" automaticamente por
 // verificadores de segurança de e-mail, o que invalida o token antes da
 // pessoa abrir de verdade). A conta em si é autenticada por telefone, então
