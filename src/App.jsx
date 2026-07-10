@@ -6,6 +6,8 @@ import { VotoRequest } from './pages/VotoRequest'
 import { VotoList } from './pages/VotoList'
 import { Localizacao } from './pages/Localizacao'
 import { Login } from './pages/Login'
+import { EsqueciSenha } from './pages/EsqueciSenha'
+import { RedefinirSenha } from './pages/RedefinirSenha'
 import { Setup } from './pages/Setup'
 import { ConviteCadastro } from './pages/ConviteCadastro'
 import { Equipe } from './pages/Equipe'
@@ -47,6 +49,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+          <Route path="/redefinir-senha" element={<RedefinirSenha />} />
           <Route path="/setup" element={<Setup />} />
           <Route path="/convite/:code" element={<ConviteCadastro />} />
           <Route

@@ -420,3 +420,24 @@ create policy "activity_insert_own" on activity_log
 
 create policy "activity_select_admin" on activity_log
   for select using (is_admin());
+
+-- ============================================================
+-- 13. Esqueci a senha — usado pela Edge Function forgot-password
+--     (supabase/functions/forgot-password), que roda com a service
+--     role e não passa pelas policies de RLS acima; esta função só
+--     existe para localizar a conta a partir do telefone digitado,
+--     com o mesmo padrão de normalização das outras buscas por telefone.
+-- ============================================================
+create or replace function get_profile_for_password_reset(phone text)
+returns table (id uuid, nome text, email text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select id, nome, email from profiles
+  where regexp_replace(telefone, '\D', '', 'g') = regexp_replace(phone, '\D', '', 'g')
+  limit 1;
+$$;
+
+grant execute on function get_profile_for_password_reset(text) to service_role;

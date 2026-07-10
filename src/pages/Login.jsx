@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Eye, EyeOff, LogIn, Phone, Loader2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { formatPhone } from '../utils/formatters'
@@ -108,6 +108,13 @@ export function Login() {
             )}
             Entrar
           </button>
+
+          <Link
+            to="/esqueci-senha"
+            className="block text-center text-sm font-medium text-gray-500 hover:text-gray-900"
+          >
+            Esqueci minha senha
+          </Link>
         </form>
       </div>
     </div>
