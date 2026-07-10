@@ -53,12 +53,15 @@ export function GestaoEquipe() {
   }
 
   const handleCreateUser = async () => {
-    if (form.nome.trim().length < 3 || !isValidPhone(form.telefone) || form.password.length < 6) {
-      setCreateError('Preencha nome, um telefone válido e uma senha com pelo menos 6 caracteres.')
-      return
-    }
-    if (form.email && !isValidEmail(form.email)) {
-      setCreateError('E-mail inválido.')
+    if (
+      form.nome.trim().length < 3 ||
+      !isValidPhone(form.telefone) ||
+      !isValidEmail(form.email) ||
+      form.password.length < 6
+    ) {
+      setCreateError(
+        'Preencha nome, um telefone válido, um e-mail válido e uma senha com pelo menos 6 caracteres.',
+      )
       return
     }
 
@@ -192,7 +195,7 @@ export function GestaoEquipe() {
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#b8e000]"
               />
             </Field>
-            <Field label="E-mail (opcional)">
+            <Field label="E-mail *">
               <input
                 type="email"
                 value={form.email}
