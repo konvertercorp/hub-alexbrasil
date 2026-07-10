@@ -3,12 +3,12 @@ import { Search, Plus, X, Loader2, ShieldCheck, ShieldOff } from 'lucide-react'
 import { supabase, phoneToEmail, createEphemeralClient } from '../../lib/supabaseClient'
 import { useAuth } from '../../context/AuthContext'
 import { ROLE_LABELS, generateInviteCode } from '../../utils/roles'
-import { formatPhone, isValidPhone } from '../../utils/formatters'
+import { formatPhone, isValidPhone, isValidEmail } from '../../utils/formatters'
 import { logActivity } from '../../utils/activityLog'
 
 const ROLE_OPTIONS = ['lider', 'deputado', 'admin']
 
-const BLANK_FORM = { nome: '', telefone: '', password: '', role: 'lider' }
+const BLANK_FORM = { nome: '', telefone: '', email: '', password: '', role: 'lider' }
 
 function formatDate(isoString) {
   return new Date(isoString).toLocaleDateString('pt-BR')
@@ -57,6 +57,10 @@ export function GestaoEquipe() {
       setCreateError('Preencha nome, um telefone válido e uma senha com pelo menos 6 caracteres.')
       return
     }
+    if (form.email && !isValidEmail(form.email)) {
+      setCreateError('E-mail inválido.')
+      return
+    }
 
     setCreating(true)
     setCreateError('')
@@ -77,6 +81,7 @@ export function GestaoEquipe() {
         username: form.telefone.replace(/\D/g, ''),
         nome: form.nome,
         telefone: form.telefone,
+        email: form.email.trim() || null,
         role: form.role,
         parent_id: null,
         invite_code: generateInviteCode(),
@@ -184,6 +189,15 @@ export function GestaoEquipe() {
                 value={form.telefone}
                 onChange={(e) => setField('telefone', formatPhone(e.target.value))}
                 placeholder="(11) 91234-5678"
+                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#b8e000]"
+              />
+            </Field>
+            <Field label="E-mail (opcional)">
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setField('email', e.target.value)}
+                placeholder="seuemail@exemplo.com"
                 className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#b8e000]"
               />
             </Field>

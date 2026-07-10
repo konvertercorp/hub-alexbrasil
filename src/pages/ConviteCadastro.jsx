@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
 import { InstallHint } from '../components/InstallHint'
 import { ROLE_LABELS, INVITEE_ROLE } from '../utils/roles'
-import { formatPhone, isValidPhone } from '../utils/formatters'
+import { formatPhone, isValidPhone, isValidEmail } from '../utils/formatters'
 
 export function ConviteCadastro() {
   const { code } = useParams()
@@ -17,7 +17,7 @@ export function ConviteCadastro() {
   const [inviter, setInviter] = useState(null)
   const [inviteError, setInviteError] = useState('')
 
-  const [form, setForm] = useState({ nome: '', telefone: '', password: '' })
+  const [form, setForm] = useState({ nome: '', telefone: '', email: '', password: '' })
   const [formError, setFormError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
@@ -56,8 +56,15 @@ export function ConviteCadastro() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (form.nome.trim().length < 3 || !isValidPhone(form.telefone) || form.password.length < 6) {
-      setFormError('Preencha nome, um telefone válido e uma senha com pelo menos 6 caracteres')
+    if (
+      form.nome.trim().length < 3 ||
+      !isValidPhone(form.telefone) ||
+      !isValidEmail(form.email) ||
+      form.password.length < 6
+    ) {
+      setFormError(
+        'Preencha nome, um telefone válido, um e-mail válido e uma senha com pelo menos 6 caracteres',
+      )
       return
     }
 
@@ -66,6 +73,7 @@ export function ConviteCadastro() {
       telefone: form.telefone,
       password: form.password,
       nome: form.nome,
+      email: form.email.trim(),
       role: INVITEE_ROLE,
       parentId: inviter.id,
     })
@@ -189,6 +197,17 @@ export function ConviteCadastro() {
               type="text"
               value={form.nome}
               onChange={(e) => setField('nome', e.target.value)}
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#b8e000]"
+            />
+          </FormField>
+
+          <FormField label="E-mail">
+            <input
+              type="email"
+              autoComplete="email"
+              value={form.email}
+              onChange={(e) => setField('email', e.target.value)}
+              placeholder="seuemail@exemplo.com"
               className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:ring-2 focus:ring-[#b8e000]"
             />
           </FormField>

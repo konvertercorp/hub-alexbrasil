@@ -8,6 +8,7 @@ create table if not exists profiles (
   username text unique not null,
   nome text not null,
   telefone text,
+  email text,
   role text not null check (role in ('deputado', 'lider', 'apoiador')),
   parent_id uuid references profiles(id),
   invite_code text unique not null,
@@ -15,6 +16,11 @@ create table if not exists profiles (
 );
 
 alter table profiles enable row level security;
+
+-- Coluna adicionada depois — roda sem erro em bancos que já tinham a tabela.
+-- Guarda o e-mail real da pessoa (separado do e-mail sintético usado só
+-- para o login por telefone), usado no futuro fluxo de "esqueci a senha".
+alter table profiles add column if not exists email text;
 
 -- ============================================================
 -- 2. Pedidos de voto (cadastro de eleitor/liderança)

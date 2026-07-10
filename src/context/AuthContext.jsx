@@ -60,7 +60,7 @@ export function AuthProvider({ children }) {
   // Cria a conta de autenticação + linha de perfil (usado no bootstrap
   // do primeiro Deputado e na tela de resgate de convite). O telefone é
   // o login da pessoa — não existe um "usuário" separado.
-  const register = async ({ telefone, password, nome, role, parentId }) => {
+  const register = async ({ telefone, password, nome, role, parentId, email }) => {
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: phoneToEmail(telefone),
       password,
@@ -77,6 +77,7 @@ export function AuthProvider({ children }) {
       username: telefone.replace(/\D/g, ''),
       nome,
       telefone,
+      email: email || null,
       role,
       parent_id: parentId ?? null,
       invite_code: generateInviteCode(),

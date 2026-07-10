@@ -19,6 +19,10 @@ export function isValidPhone(rawValue) {
   return digits.length === 10 || digits.length === 11
 }
 
+export function isValidEmail(rawValue) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawValue.trim())
+}
+
 export function formatCPF(rawValue) {
   const digits = rawValue.replace(/\D/g, '').slice(0, 11)
   const part1 = digits.slice(0, 3)
