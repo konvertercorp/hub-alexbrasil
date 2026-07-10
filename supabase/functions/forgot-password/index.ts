@@ -1,14 +1,17 @@
-// Edge Function: recebe um telefone, localiza a conta correspondente e,
-// se ela tiver um e-mail cadastrado, envia um link de redefinição de senha
-// via Resend. Sempre responde com sucesso genérico (não revela se o
-// telefone existe ou tem e-mail) para não permitir enumeração de contas.
+// Edge Function: recebe um e-mail, localiza a conta correspondente e
+// envia um código de 6 dígitos por e-mail via Resend (em vez de um link —
+// links de recuperação costumam ser "clicados" automaticamente por
+// verificadores de segurança de e-mail, o que invalida o token antes da
+// pessoa abrir de verdade). A conta em si é autenticada por telefone, então
+// o código é gerado para o e-mail sintético usado internamente no login;
+// devolvemos o telefone associado para o front-end conseguir verificar o
+// código na etapa seguinte.
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const APP_URL = 'https://hubalexbrasil.com.br'
 const FROM_EMAIL = 'HUB AlexBrasil <naoresponda@hubalexbrasil.com.br>'
 
 function jsonResponse(body: unknown, status = 200) {
@@ -24,9 +27,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { telefone } = await req.json()
-    if (!telefone || typeof telefone !== 'string') {
-      return jsonResponse({ success: false, error: 'Telefone é obrigatório.' }, 400)
+    const { email } = await req.json()
+    if (!email || typeof email !== 'string') {
+      return jsonResponse({ success: false, error: 'E-mail é obrigatório.' }, 400)
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -36,32 +39,31 @@ Deno.serve(async (req) => {
     const { createClient } = await import('npm:@supabase/supabase-js@2')
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
-    const { data: profileRows } = await supabaseAdmin.rpc('get_profile_for_password_reset', {
-      phone: telefone,
-    })
+    const { data: profileRows } = await supabaseAdmin.rpc(
+      'get_profile_for_password_reset_by_email',
+      { email_input: email.trim() },
+    )
     const profile = profileRows?.[0]
 
-    // Telefone não encontrado ou sem e-mail cadastrado: responde sucesso
-    // mesmo assim, sem enviar nada — evita que alguém descubra quais
-    // telefones têm conta só testando essa tela.
-    if (!profile?.email || !resendApiKey) {
+    // E-mail não encontrado: responde sucesso mesmo assim, sem enviar
+    // nada — evita que alguém descubra quais e-mails têm conta só
+    // testando essa tela.
+    if (!profile?.telefone || !resendApiKey) {
       return jsonResponse({ success: true })
     }
 
-    const digits = telefone.replace(/\D/g, '')
+    const digits = profile.telefone.replace(/\D/g, '')
     const syntheticEmail = `${digits}@example.com`
 
     const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: syntheticEmail,
-      options: { redirectTo: `${APP_URL}/redefinir-senha` },
     })
 
-    if (linkError || !linkData?.properties?.action_link) {
+    const code = linkData?.properties?.email_otp
+    if (linkError || !code) {
       return jsonResponse({ success: true })
     }
-
-    const actionLink = linkData.properties.action_link
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -72,17 +74,18 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: profile.email,
-        subject: 'Redefinir sua senha — HUB AlexBrasil',
+        subject: 'Seu código para redefinir a senha — HUB AlexBrasil',
         html: `
           <p>Olá, ${profile.nome ?? ''}!</p>
           <p>Recebemos um pedido para redefinir a senha da sua conta no HUB AlexBrasil.</p>
-          <p><a href="${actionLink}" style="display:inline-block;background:#b8e000;color:#111827;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Redefinir senha</a></p>
-          <p>Se você não pediu isso, pode ignorar este e-mail — sua senha continua a mesma.</p>
+          <p>Digite este código no app para continuar:</p>
+          <p style="font-size:28px;font-weight:700;letter-spacing:4px;">${code}</p>
+          <p>O código vale por alguns minutos. Se você não pediu isso, pode ignorar este e-mail — sua senha continua a mesma.</p>
         `,
       }),
     })
 
-    return jsonResponse({ success: true })
+    return jsonResponse({ success: true, telefone: profile.telefone })
   } catch {
     return jsonResponse({ success: true })
   }

@@ -425,19 +425,22 @@ create policy "activity_select_admin" on activity_log
 -- 13. Esqueci a senha — usado pela Edge Function forgot-password
 --     (supabase/functions/forgot-password), que roda com a service
 --     role e não passa pelas policies de RLS acima; esta função só
---     existe para localizar a conta a partir do telefone digitado,
---     com o mesmo padrão de normalização das outras buscas por telefone.
+--     existe para localizar a conta a partir do e-mail digitado (o
+--     código de recuperação é gerado depois para o e-mail sintético
+--     usado internamente no login por telefone).
 -- ============================================================
-create or replace function get_profile_for_password_reset(phone text)
-returns table (id uuid, nome text, email text)
+drop function if exists get_profile_for_password_reset(text);
+
+create or replace function get_profile_for_password_reset_by_email(email_input text)
+returns table (id uuid, nome text, telefone text, email text)
 language sql
 security definer
 set search_path = public
 stable
 as $$
-  select id, nome, email from profiles
-  where regexp_replace(telefone, '\D', '', 'g') = regexp_replace(phone, '\D', '', 'g')
+  select id, nome, telefone, email from profiles
+  where lower(email) = lower(email_input)
   limit 1;
 $$;
 
-grant execute on function get_profile_for_password_reset(text) to service_role;
+grant execute on function get_profile_for_password_reset_by_email(text) to service_role;

@@ -33,3 +33,4 @@ claude_settings_snippet.json
 
 # Local Netlify folder
 .netlify
+supabase/.temp/
